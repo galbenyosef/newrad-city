@@ -1,0 +1,893 @@
+/* src/crafting/crafting.css */
+/* =====================================================================
+ * NEW RAD CITY — crafting screen (workbench / campfire / reloading bench)
+ * VIGIL goggles readout: pale cyan-white CRT text with bloom on a dark
+ * blue-grey field, dim rule lines, hard square frame with corner brackets,
+ * bracketed headers, uppercase wide-spaced monospace. Amber = warning,
+ * red = critical. Prefix: craft-
+ * ===================================================================== */
+.craft-root {
+  position: fixed;
+  inset: 0;
+  z-index: 330;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --cc: #cfeefa;
+  --cc-rgb: 207, 238, 250;
+  --cline: rgba(150, 220, 240, 0.35);
+  --cline-rgb: 150, 220, 240;
+  --camb: #ffb347;
+  --cbad: #ff5a4a;
+  --cink: #06121a;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(12, 20, 28, 0.62),
+    rgba(4, 8, 12, 0.88)
+  );
+  font-family: "Share Tech Mono", "VT323", "Courier New", monospace;
+  color: var(--cc);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 6px rgba(var(--cc-rgb), 0.5);
+  user-select: none;
+}
+.craft-root * {
+  box-sizing: border-box;
+}
+.craft-root.craft-hidden {
+  display: none;
+}
+.craft-root:not(.craft-hidden) .craft-box {
+  animation: craftIn 0.24s ease-out;
+}
+@keyframes craftIn {
+  0% {
+    opacity: 0;
+    filter: brightness(2.4) blur(1px);
+  }
+  30% {
+    opacity: 0.55;
+  }
+  45% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+.craft-box {
+  position: relative;
+  width: min(1120px, 94vw);
+  height: min(680px, 88vh);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px 12px;
+  overflow: hidden;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(var(--cline-rgb), 0.07),
+      rgba(6, 12, 18, 0.95) 74%
+    ),
+    #050b10;
+  border: 1px solid var(--cline);
+  box-shadow:
+    0 0 30px rgba(var(--cline-rgb), 0.12),
+    inset 0 0 70px rgba(0, 0, 0, 0.8);
+}
+/* corner brackets */
+.craft-box::before,
+.craft-box::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  z-index: 4;
+  border: 2px solid var(--cc);
+  box-shadow: 0 0 6px rgba(var(--cc-rgb), 0.5);
+}
+.craft-box::before {
+  top: 5px;
+  left: 5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.craft-box::after {
+  bottom: 5px;
+  right: 5px;
+  border-left: 0;
+  border-top: 0;
+}
+.craft-root[data-station="campfire"] .craft-box {
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(255, 179, 71, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(var(--cline-rgb), 0.07),
+      rgba(6, 12, 18, 0.95) 74%
+    ),
+    #050b10;
+}
+.craft-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.22) 0 1px,
+    transparent 1px 3px
+  );
+  animation: craftFlicker 5s infinite steps(1);
+}
+.craft-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(
+        to bottom,
+        transparent 0,
+        rgba(var(--cc-rgb), 0.05) 50%,
+        transparent 100%
+      )
+      0 -120% / 100% 40% no-repeat,
+    radial-gradient(
+      ellipse at center,
+      transparent 62%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  animation: craftSweep 6s linear infinite;
+}
+@keyframes craftFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.9;
+  }
+  42% {
+    opacity: 1;
+  }
+  77% {
+    opacity: 0.94;
+  }
+}
+@keyframes craftSweep {
+  0% {
+    background-position:
+      0 -120%,
+      0 0;
+  }
+  100% {
+    background-position:
+      0 220%,
+      0 0;
+  }
+}
+
+.craft-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--cline);
+  padding-bottom: 6px;
+}
+.craft-glyph {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.craft-glyph-svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--cc);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 2px rgba(var(--cc-rgb), 0.7));
+}
+.craft-glyph-svg .br {
+  stroke: var(--cline);
+  stroke-width: 1.5;
+}
+.craft-title {
+  font-size: 26px;
+  letter-spacing: 0.32em;
+  flex: 1;
+}
+.craft-skills {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+  text-align: right;
+}
+
+.craft-tabs {
+  display: flex;
+  gap: 18px;
+  margin: 9px 0 8px;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  flex-wrap: wrap;
+}
+.craft-tabs b {
+  font-weight: normal;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 2px 9px;
+  border: 1px solid transparent;
+}
+.craft-tabs b::before {
+  content: "[ ";
+  opacity: 0;
+}
+.craft-tabs b::after {
+  content: " ]";
+  opacity: 0;
+}
+.craft-tabs b:hover {
+  opacity: 0.8;
+}
+.craft-tabs b.on {
+  opacity: 1;
+  border-color: var(--cline);
+  background: rgba(var(--cline-rgb), 0.08);
+}
+.craft-tabs b.on::before,
+.craft-tabs b.on::after {
+  opacity: 1;
+}
+
+.craft-body {
+  flex: 1;
+  display: flex;
+  gap: 22px;
+  min-height: 0;
+}
+.craft-list {
+  flex: 0 0 40%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  font-size: 16px;
+  scrollbar-width: none;
+}
+.craft-list::-webkit-scrollbar {
+  display: none;
+}
+.craft-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 9px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.craft-list li:hover {
+  border-color: var(--cline);
+}
+.craft-list li small {
+  opacity: 0.75;
+  font-size: 12px;
+}
+.craft-list li > i {
+  font-style: normal;
+  opacity: 0.75;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.craft-list li > i.bad {
+  color: var(--camb);
+  text-shadow: 0 0 5px rgba(255, 179, 71, 0.45);
+  opacity: 0.95;
+}
+.craft-list li > i.cp {
+  letter-spacing: 0.15em;
+  font-size: 12px;
+}
+.craft-list li > i.cbar {
+  display: inline-block;
+  width: 64px;
+  height: 7px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+.craft-list li > i.cbar span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+}
+.craft-list li .eqd {
+  font-size: 11px;
+}
+.craft-list li.dim {
+  opacity: 0.5;
+}
+.craft-list li.sel {
+  background: rgba(var(--cc-rgb), 0.88);
+  color: var(--cink);
+  text-shadow: none;
+  opacity: 1;
+}
+.craft-list li.sel > i.bad {
+  color: #6a3a00;
+  text-shadow: none;
+}
+.craft-list li.empty {
+  cursor: default;
+  opacity: 0.72;
+  line-height: 1.5;
+  font-size: 14px;
+  white-space: normal;
+}
+
+.craft-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 14px;
+}
+.craft-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: 4px;
+}
+.craft-scroll::-webkit-scrollbar {
+  display: none;
+}
+.craft-scroll.more {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 34px),
+    rgba(0, 0, 0, 0.25)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 34px),
+    rgba(0, 0, 0, 0.25)
+  );
+}
+.craft-info {
+  position: relative;
+}
+.craft-info:has(> .craft-scroll.more)::after {
+  content: "\25BC  MORE";
+  position: absolute;
+  right: 4px;
+  bottom: 44px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: craftMore 1.6s ease-in-out infinite;
+}
+@keyframes craftMore {
+  50% {
+    opacity: 0.35;
+    transform: translateY(2px);
+  }
+}
+.craft-info h3 {
+  margin: 4px 0 6px;
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+}
+.craft-info h3 small {
+  font-size: 13px;
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+.craft-info h3 small.eq {
+  border: 1px solid currentColor;
+  padding: 0 5px;
+  margin-left: 6px;
+  font-size: 11px;
+}
+.craft-info h4 {
+  margin: 10px 0 4px;
+  font-weight: normal;
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  opacity: 0.85;
+  border-bottom: 1px solid var(--cline);
+}
+.craft-info h4::before {
+  content: "[ ";
+}
+.craft-info h4::after {
+  content: " ]";
+}
+.craft-note {
+  margin: 0 0 6px;
+  line-height: 1.45;
+  opacity: 0.88;
+  letter-spacing: 0.05em;
+}
+.craft-sub {
+  font-size: 12px;
+  opacity: 0.72;
+  margin: 2px 0 6px;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+}
+.craft-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 6px 0;
+}
+.craft-stats span {
+  border: 1px solid var(--cline);
+  padding: 1px 7px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.craft-bpwrap {
+  position: relative;
+  border: 1px solid var(--cline);
+  background: rgba(var(--cline-rgb), 0.03);
+  margin-bottom: 6px;
+  box-shadow: inset 0 0 22px rgba(var(--cline-rgb), 0.06);
+}
+.craft-bp {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 210px;
+}
+.craft-bp .grid {
+  fill: none;
+  stroke: rgba(var(--cline-rgb), 0.12);
+  stroke-width: 0.5;
+}
+.craft-bp .frame {
+  stroke: var(--cline);
+  stroke-width: 1;
+}
+.craft-bp .art {
+  fill: none;
+  stroke: var(--cc);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px rgba(var(--cc-rgb), 0.7));
+}
+.craft-bp .art .t {
+  stroke-width: 0.9;
+  opacity: 0.85;
+}
+.craft-bp .art .h {
+  stroke-width: 0.9;
+  stroke-dasharray: 4 3;
+  opacity: 0.75;
+}
+.craft-bp .art .f {
+  fill: rgba(var(--cc-rgb), 0.14);
+}
+.craft-bp .dim path {
+  fill: none;
+  stroke: rgba(var(--cline-rgb), 0.8);
+  stroke-width: 0.7;
+}
+.craft-bp .dim .arr {
+  fill: rgba(var(--cline-rgb), 0.9);
+  stroke: none;
+}
+.craft-bp .dimt {
+  fill: var(--cc);
+  font-size: 8px;
+  text-anchor: middle;
+  letter-spacing: 1px;
+}
+.craft-bp .lead {
+  fill: none;
+  stroke: rgba(var(--cline-rgb), 0.8);
+  stroke-width: 0.7;
+  stroke-dasharray: 2 2;
+}
+.craft-bp .dot {
+  fill: var(--cc);
+}
+.craft-bp .bub {
+  fill: var(--cink);
+  stroke: var(--cc);
+  stroke-width: 1;
+}
+.craft-bp .num {
+  fill: var(--cc);
+  font-size: 8.5px;
+  text-anchor: middle;
+  font-weight: bold;
+}
+.craft-bp .tblock path {
+  fill: none;
+  stroke: var(--cline);
+  stroke-width: 0.8;
+}
+.craft-bp .tb1 {
+  fill: var(--cc);
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  font-weight: bold;
+}
+.craft-bp .tb2 {
+  fill: var(--cc);
+  font-size: 8px;
+  letter-spacing: 0.4px;
+  opacity: 0.85;
+}
+
+.craft-parts,
+.craft-methods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.craft-parts li,
+.craft-methods li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+}
+.craft-parts li u,
+.craft-methods li u {
+  text-decoration: none;
+  display: inline-flex;
+  width: 17px;
+  height: 17px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 0;
+  font-size: 10px;
+  flex: 0 0 17px;
+  letter-spacing: 0;
+}
+.craft-parts li span,
+.craft-methods li span {
+  flex: 1;
+}
+.craft-parts li i,
+.craft-methods li i {
+  font-style: normal;
+  font-size: 12px;
+}
+.craft-parts li.no {
+  opacity: 0.45;
+}
+.craft-methods li {
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.craft-methods li:hover {
+  border-color: var(--cline);
+}
+.craft-methods li.no {
+  opacity: 0.45;
+  cursor: default;
+}
+.craft-methods li.no i {
+  font-size: 11px;
+}
+.craft-reqs {
+  margin: 7px 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+.craft-reqs em {
+  font-style: normal;
+  opacity: 0.7;
+}
+.craft-reqs .no {
+  color: var(--camb);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.5);
+}
+
+.craft-cnd {
+  margin: 6px 0 2px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: 0.1em;
+}
+.craft-cnd b {
+  font-weight: normal;
+  letter-spacing: 0.18em;
+}
+.craft-cnd .bar {
+  position: relative;
+  display: inline-block;
+  width: 150px;
+  height: 9px;
+  border: 1px solid var(--cc);
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0 14px,
+    rgba(var(--cline-rgb), 0.5) 14px 15px
+  );
+}
+.craft-cnd .bar i {
+  display: block;
+  height: 100%;
+  background: var(--cc);
+}
+.craft-cnd .bar em {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--camb);
+}
+
+.craft-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.craft-btns button {
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cink);
+  background: var(--cc);
+  border: 0;
+  padding: 5px 18px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(var(--cc-rgb), 0.45);
+}
+.craft-btns button b {
+  border: 1px solid var(--cink);
+  padding: 0 4px;
+  font-weight: normal;
+  margin-right: 4px;
+}
+.craft-btns button:hover {
+  filter: brightness(1.1);
+}
+.craft-btns button.off {
+  background: transparent;
+  color: var(--camb);
+  border: 1px dashed rgba(255, 179, 71, 0.6);
+  box-shadow: none;
+  opacity: 0.85;
+  cursor: default;
+  text-shadow: 0 0 5px rgba(255, 179, 71, 0.4);
+}
+
+.craft-glyph-big {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  opacity: 0.45;
+}
+.craft-glyph-big .craft-glyph-svg {
+  width: 180px;
+  height: 180px;
+  stroke-width: 1.2;
+}
+.craft-msg {
+  min-height: 20px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  margin-top: 6px;
+}
+.craft-msg.bad {
+  color: var(--cbad);
+  text-shadow: 0 0 6px rgba(255, 90, 74, 0.5);
+}
+.craft-foot {
+  border-top: 1px solid var(--cline);
+  padding-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  opacity: 0.88;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.craft-foot b {
+  border: 1px solid var(--cline);
+  padding: 0 5px;
+  font-weight: normal;
+  margin-right: 3px;
+}
+
+@media (max-width: 760px) {
+  .craft-body {
+    flex-direction: column;
+  }
+  .craft-list {
+    flex: 0 0 34%;
+  }
+  .craft-title {
+    font-size: 20px;
+    letter-spacing: 0.2em;
+  }
+}
+
+/* ---- quantity selector, modify view, stat comparison, yields ---- */
+.craft-root[data-station="reloading"] .craft-box {
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(255, 179, 71, 0.05),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(var(--cline-rgb), 0.07),
+      rgba(6, 12, 18, 0.95) 74%
+    ),
+    #050b10;
+}
+.craft-info h3 small.own {
+  float: right;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+.craft-info h4 em {
+  font-style: normal;
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+.craft-note.small {
+  font-size: 12px;
+  opacity: 0.72;
+}
+.craft-parts.yields li i small {
+  opacity: 0.6;
+  font-size: 10px;
+}
+.craft-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--cline);
+}
+.craft-qty button {
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--cc);
+  background: transparent;
+  border: 0;
+  padding: 5px 11px;
+  cursor: pointer;
+  box-shadow: none;
+  letter-spacing: 0;
+}
+.craft-qty button:hover {
+  background: rgba(var(--cline-rgb), 0.15);
+}
+.craft-qty b {
+  min-width: 42px;
+  text-align: center;
+  font-weight: normal;
+  font-size: 16px;
+  border-left: 1px solid var(--cline);
+  border-right: 1px solid var(--cline);
+  padding: 3px 4px;
+}
+.craft-qty em {
+  font-style: normal;
+  font-size: 11px;
+  opacity: 0.65;
+  padding: 0 8px;
+}
+.craft-cmp {
+  border-collapse: collapse;
+  margin: 4px 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  min-width: 62%;
+}
+.craft-cmp th {
+  text-align: left;
+  font-weight: normal;
+  opacity: 0.75;
+  padding: 1px 14px 1px 0;
+  letter-spacing: 0.18em;
+}
+.craft-cmp td {
+  padding: 1px 8px 1px 0;
+  white-space: nowrap;
+}
+.craft-cmp td.ar {
+  opacity: 0.6;
+}
+.craft-cmp tr.up td:last-child,
+.craft-cmp td.up {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(var(--cc-rgb), 0.95);
+  font-weight: bold;
+}
+.craft-cmp tr.down td:last-child {
+  color: var(--cbad);
+  text-shadow: 0 0 6px rgba(255, 90, 74, 0.5);
+}
+.craft-mods li small {
+  opacity: 0.65;
+  font-size: 10px;
+  margin-left: 6px;
+  letter-spacing: 0.1em;
+}
+.craft-mods li.cur {
+  border-color: rgba(var(--cc-rgb), 0.7);
+  background: rgba(var(--cline-rgb), 0.12);
+  opacity: 1;
+}
+.craft-mods li.inst i {
+  border: 1px solid currentColor;
+  padding: 0 5px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.craft-list li > i b.rdy {
+  font-weight: normal;
+  border: 1px solid currentColor;
+  padding: 0 3px;
+  font-size: 10px;
+}
+/* keep the action row visible even when the info column scrolls */
+.craft-info .craft-btns.craft-dock {
+  flex: none;
+  margin-top: 0;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--cline);
+}
+.craft-bp {
+  max-height: 176px;
+}
+.craft-mods li.empty {
+  opacity: 0.4;
+  border: 1px dashed var(--cline);
+  cursor: default;
+  letter-spacing: 0.1em;
+}
+.craft-cmp th em {
+  font-style: normal;
+  font-size: 10px;
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+/* short screens (720p): compact blueprint so the stats + description fit above the action row */
+@media (max-height: 780px) {
+  .craft-bp {
+    max-height: 136px;
+  }
+}

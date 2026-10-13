@@ -1,0 +1,779 @@
+// play-inline-312 03 — fillstyle
+// Lines 247-1023 of readable/play-inline-312.pretty.js (statement-aligned).
+  const customPaint = {
+    wallpaper(x, S, r) {
+      // faded damask
+      x.fillStyle = "#b8a48a";
+      x.fillRect(0, 0, S, S);
+      x.fillStyle = "rgba(120,70,60,0.55)";
+      for (let j = 0; j < 4; j++)
+        for (let i = 0; i < 4; i++) {
+          const cx = (i * S) / 4 + ((j % 2) * S) / 8 + S / 8,
+            cy = (j * S) / 4 + S / 8;
+          x.beginPath();
+          x.ellipse(cx, cy, S / 22, S / 12, 0, 0, Math.PI * 2);
+          x.fill();
+          x.beginPath();
+          x.ellipse(
+            cx - S / 18,
+            cy + S / 30,
+            S / 40,
+            S / 22,
+            0.6,
+            0,
+            Math.PI * 2,
+          );
+          x.fill();
+          x.beginPath();
+          x.ellipse(
+            cx + S / 18,
+            cy + S / 30,
+            S / 40,
+            S / 22,
+            -0.6,
+            0,
+            Math.PI * 2,
+          );
+          x.fill();
+        }
+      x.fillStyle = "rgba(90,60,40,0.18)";
+      for (let i = 0; i < S; i += S / 16) x.fillRect(i, 0, 2, S);
+      K.stains(x, 0, 0, S, S, 18, 11, 0.4, [70, 50, 30]);
+      K.streaks(x, 0, 0, S, S, 30, 12, 0.25);
+    },
+    wallpaper_green(x, S, r) {
+      x.fillStyle = "#6f7a5c";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < S; i += S / 8) {
+        x.fillStyle = "rgba(40,50,30,0.35)";
+        x.fillRect(i, 0, S / 32, S);
+        x.fillStyle = "rgba(200,190,140,0.2)";
+        x.fillRect(i + S / 16, 0, 3, S);
+      }
+      K.stains(x, 0, 0, S, S, 16, 21, 0.45, [50, 40, 25]);
+      K.streaks(x, 0, 0, S, S, 24, 22, 0.3);
+    },
+    hextile(x, S, r) {
+      // Katz's small white hex floor
+      x.fillStyle = "#6f6a60";
+      x.fillRect(0, 0, S, S);
+      const R = S / 16,
+        h = (R * Math.sqrt(3)) / 2;
+      for (let j = -1; j < S / h + 1; j++)
+        for (let i = -1; i < S / (R * 1.5) + 1; i++) {
+          const cx = i * R * 1.5,
+            cy = j * h * 2 + (i % 2 ? h : 0);
+          const dark = r() < 0.05;
+          x.fillStyle = dark
+            ? "#3c3a36"
+            : "rgb(" +
+              ((205 + r() * 30) | 0) +
+              "," +
+              ((200 + r() * 28) | 0) +
+              "," +
+              ((188 + r() * 25) | 0) +
+              ")";
+          x.beginPath();
+          for (let k = 0; k < 6; k++) {
+            const a = (k * Math.PI) / 3;
+            const px = cx + Math.cos(a) * (R - 1.5),
+              py = cy + Math.sin(a) * (R - 1.5);
+            if (k) x.lineTo(px, py);
+            else x.moveTo(px, py);
+          }
+          x.fill();
+        }
+      K.stains(x, 0, 0, S, S, 22, 31, 0.5, [70, 55, 30]);
+    },
+    checker(x, S, r) {
+      const n = 8,
+        c = S / n;
+      for (let j = 0; j < n; j++)
+        for (let i = 0; i < n; i++) {
+          const w = (i + j) % 2 === 0;
+          const v = w ? 200 + r() * 30 : 30 + r() * 20;
+          x.fillStyle =
+            "rgb(" +
+            (v | 0) +
+            "," +
+            ((v * 0.97) | 0) +
+            "," +
+            ((v * 0.9) | 0) +
+            ")";
+          x.fillRect(i * c, j * c, c, c);
+        }
+      x.strokeStyle = "rgba(0,0,0,0.3)";
+      for (let i = 0; i <= n; i++) {
+        x.beginPath();
+        x.moveTo(i * c, 0);
+        x.lineTo(i * c, S);
+        x.stroke();
+        x.beginPath();
+        x.moveTo(0, i * c);
+        x.lineTo(S, i * c);
+        x.stroke();
+      }
+      K.stains(x, 0, 0, S, S, 20, 41, 0.5, [60, 45, 25]);
+    },
+    mosaic(x, S, r) {
+      // lobby mosaic floor: border + rosettes
+      x.fillStyle = "#c9bca2";
+      x.fillRect(0, 0, S, S);
+      const c = S / 32;
+      for (let j = 0; j < 32; j++)
+        for (let i = 0; i < 32; i++) {
+          const v = 180 + r() * 50;
+          x.fillStyle =
+            "rgb(" +
+            (v | 0) +
+            "," +
+            ((v * 0.93) | 0) +
+            "," +
+            ((v * 0.8) | 0) +
+            ")";
+          x.fillRect(i * c + 0.5, j * c + 0.5, c - 1, c - 1);
+        }
+      x.strokeStyle = "#6e2a22";
+      x.lineWidth = c;
+      x.strokeRect(c * 2, c * 2, S - c * 4, S - c * 4);
+      x.strokeStyle = "#2e4a3c";
+      x.lineWidth = c * 0.6;
+      x.strokeRect(c * 3.5, c * 3.5, S - c * 7, S - c * 7);
+      x.fillStyle = "#7a3026";
+      x.beginPath();
+      x.arc(S / 2, S / 2, S / 7, 0, Math.PI * 2);
+      x.fill();
+      x.fillStyle = "#c8a050";
+      for (let k = 0; k < 8; k++) {
+        const a = (k * Math.PI) / 4;
+        x.beginPath();
+        x.ellipse(
+          S / 2 + (Math.cos(a) * S) / 11,
+          S / 2 + (Math.sin(a) * S) / 11,
+          S / 40,
+          S / 90,
+          a,
+          0,
+          Math.PI * 2,
+        );
+        x.fill();
+      }
+      K.stains(x, 0, 0, S, S, 20, 51, 0.45, [60, 45, 25]);
+    },
+    tin(x, S, r) {
+      // pressed tin ceiling
+      x.fillStyle = "#b8b2a2";
+      x.fillRect(0, 0, S, S);
+      const c = S / 4;
+      for (let j = 0; j < 4; j++)
+        for (let i = 0; i < 4; i++) {
+          const X = i * c,
+            Y = j * c;
+          const g = x.createRadialGradient(
+            X + c / 2,
+            Y + c / 2,
+            c * 0.05,
+            X + c / 2,
+            Y + c / 2,
+            c * 0.5,
+          );
+          g.addColorStop(0, "#dcd6c6");
+          g.addColorStop(0.6, "#9c9686");
+          g.addColorStop(1, "#c4beae");
+          x.fillStyle = g;
+          x.fillRect(X + 3, Y + 3, c - 6, c - 6);
+          x.strokeStyle = "#7a7466";
+          x.lineWidth = 3;
+          x.strokeRect(X + 6, Y + 6, c - 12, c - 12);
+          x.beginPath();
+          x.arc(X + c / 2, Y + c / 2, c * 0.18, 0, Math.PI * 2);
+          x.stroke();
+        }
+      K.stains(x, 0, 0, S, S, 20, 61, 0.55, [90, 60, 30]);
+    },
+    lace(x, S, r) {
+      // cast-iron lace (alpha cut-out): Hotel Chelsea balconies & stair balusters
+      x.clearRect(0, 0, S, S);
+      x.strokeStyle = "#fff";
+      x.fillStyle = "#fff";
+      x.lineWidth = S / 40;
+      x.strokeRect(0, S * 0.02, S, S * 0.96); // top/bottom rails
+      x.fillRect(0, 0, S, S * 0.07);
+      x.fillRect(0, S * 0.93, S, S * 0.07);
+      const n = 2,
+        w = S / n;
+      for (let i = 0; i < n; i++) {
+        const cx = i * w + w / 2;
+        x.lineWidth = S / 64;
+        x.beginPath();
+        x.moveTo(i * w + 2, S * 0.07);
+        x.lineTo(i * w + 2, S * 0.93);
+        x.stroke(); // posts
+        // central flower
+        x.beginPath();
+        x.arc(cx, S * 0.5, w * 0.16, 0, Math.PI * 2);
+        x.stroke();
+        x.beginPath();
+        x.arc(cx, S * 0.5, w * 0.05, 0, Math.PI * 2);
+        x.fill();
+        for (let k = 0; k < 4; k++) {
+          const a = (k * Math.PI) / 2 + Math.PI / 4;
+          x.beginPath();
+          x.ellipse(
+            cx + Math.cos(a) * w * 0.28,
+            S * 0.5 + Math.sin(a) * w * 0.28,
+            w * 0.12,
+            w * 0.05,
+            a,
+            0,
+            Math.PI * 2,
+          );
+          x.stroke();
+        }
+        // C-scrolls top & bottom
+        for (const yy of [0.2, 0.8]) {
+          x.beginPath();
+          x.arc(cx - w * 0.18, S * yy, w * 0.12, -Math.PI * 0.5, Math.PI * 0.9);
+          x.stroke();
+          x.beginPath();
+          x.arc(cx + w * 0.18, S * yy, w * 0.12, Math.PI * 0.1, Math.PI * 1.5);
+          x.stroke();
+        }
+        // diamond frame
+        x.beginPath();
+        x.moveTo(cx, S * 0.1);
+        x.lineTo(i * w + w * 0.95, S * 0.5);
+        x.lineTo(cx, S * 0.9);
+        x.lineTo(i * w + w * 0.05, S * 0.5);
+        x.closePath();
+        x.stroke();
+      }
+    },
+    rooftile(x, S, r) {
+      // glazed Chinese roof tiles (tinted by vertex colour)
+      x.fillStyle = "#3a3a34";
+      x.fillRect(0, 0, S, S);
+      const n = 8,
+        c = S / n;
+      for (let i = 0; i < n; i++) {
+        const g = x.createLinearGradient(i * c, 0, i * c + c, 0);
+        g.addColorStop(0, "#5a5a52");
+        g.addColorStop(0.5, "#e8e8d8");
+        g.addColorStop(1, "#4a4a42");
+        x.fillStyle = g;
+        x.fillRect(i * c + 2, 0, c - 4, S);
+        for (let j = 0; j < 6; j++) {
+          x.fillStyle = "rgba(20,20,15,0.5)";
+          x.fillRect(i * c, (j * S) / 6, c, 3);
+        }
+      }
+      K.stains(x, 0, 0, S, S, 14, 71, 0.5, [40, 50, 30]);
+      K.streaks(x, 0, 0, S, S, 20, 72, 0.3);
+    },
+    lacquer(x, S, r) {
+      // red lacquered panel with gold fret border
+      x.fillStyle = "#8a1a12";
+      x.fillRect(0, 0, S, S);
+      x.strokeStyle = "#c89a3a";
+      x.lineWidth = S / 40;
+      x.strokeRect(S * 0.06, S * 0.06, S * 0.88, S * 0.88);
+      x.lineWidth = S / 80;
+      for (let i = 0; i < 6; i++) {
+        const X = S * 0.12 + i * S * 0.13;
+        x.beginPath();
+        x.moveTo(X, S * 0.12);
+        x.lineTo(X + S * 0.08, S * 0.12);
+        x.lineTo(X + S * 0.08, S * 0.2);
+        x.lineTo(X + S * 0.03, S * 0.2);
+        x.stroke();
+      }
+      K.stains(x, 0, 0, S, S, 18, 81, 0.45, [30, 10, 5]);
+      K.grain(x, 0, 0, S, S, 30, 82);
+    },
+    plaster(x, S, r) {
+      // subtle stained plaster (no big blotches)
+      x.fillStyle = "#cbc3b1";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 60; i++) {
+        const px = r() * S,
+          py = r() * S,
+          rad = 20 + r() * 90,
+          g = x.createRadialGradient(px, py, 0, px, py, rad);
+        const t = r() < 0.5 ? "150,140,120" : "225,218,200";
+        g.addColorStop(0, "rgba(" + t + ",0.16)");
+        g.addColorStop(1, "rgba(" + t + ",0)");
+        x.fillStyle = g;
+        x.fillRect(px - rad, py - rad, rad * 2, rad * 2);
+      }
+      x.strokeStyle = "rgba(70,60,50,0.35)";
+      x.lineWidth = 0.8;
+      for (let i = 0; i < 5; i++) {
+        x.beginPath();
+        let px = r() * S,
+          py = r() * S;
+        x.moveTo(px, py);
+        for (let k = 0; k < 5; k++) {
+          const qx = px + (r() - 0.5) * 70,
+            qy = py + (r() - 0.3) * 60;
+          x.quadraticCurveTo(
+            px + (r() - 0.5) * 30,
+            py + (r() - 0.5) * 30,
+            qx,
+            qy,
+          );
+          px = qx;
+          py = qy;
+        }
+        x.stroke();
+      }
+      K.streaks(x, 0, 0, S, S, 14, 7, 0.12);
+      K.grain(x, 0, 0, S, S, 22, 8);
+    },
+    marble(x, S, r) {
+      x.fillStyle = "#e4ded0";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 30; i++) {
+        const px = r() * S,
+          py = r() * S,
+          rad = 30 + r() * 110,
+          g = x.createRadialGradient(px, py, 0, px, py, rad);
+        const t = r() < 0.5 ? "200,194,180" : "245,242,232";
+        g.addColorStop(0, "rgba(" + t + ",0.35)");
+        g.addColorStop(1, "rgba(" + t + ",0)");
+        x.fillStyle = g;
+        x.fillRect(px - rad, py - rad, rad * 2, rad * 2);
+      }
+      for (let i = 0; i < 14; i++) {
+        x.strokeStyle =
+          "rgba(120,112,100," + (0.12 + r() * 0.22).toFixed(2) + ")";
+        x.lineWidth = 0.6 + r() * 1.6;
+        x.beginPath();
+        let px = r() * S,
+          py = r() * S;
+        x.moveTo(px, py);
+        for (let k = 0; k < 5; k++) {
+          const qx = px + (r() - 0.3) * 120,
+            qy = py + (r() - 0.5) * 80;
+          x.bezierCurveTo(
+            px + (r() - 0.5) * 60,
+            py + (r() - 0.5) * 60,
+            qx + (r() - 0.5) * 60,
+            qy + (r() - 0.5) * 60,
+            qx,
+            qy,
+          );
+          px = qx;
+          py = qy;
+        }
+        x.stroke();
+      }
+      x.strokeStyle = "rgba(60,55,50,0.35)";
+      x.lineWidth = 2;
+      x.strokeRect(1, 1, S - 2, S - 2);
+      K.stains(x, 0, 0, S, S, 6, 91, 0.2);
+    },
+    terrazzo(x, S, r) {
+      x.fillStyle = "#9a948a";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 1600; i++) {
+        const v = r();
+        x.fillStyle =
+          v < 0.3
+            ? "#5a5650"
+            : v < 0.6
+              ? "#c8c2b4"
+              : v < 0.8
+                ? "#8a6a52"
+                : "#3a3a3a";
+        x.fillRect(r() * S, r() * S, 2 + r() * 5, 2 + r() * 5);
+      }
+      K.stains(x, 0, 0, S, S, 20, 101, 0.45);
+    },
+    padded(x, S, r) {
+      // padded / tiled cell wall
+      x.fillStyle = "#a8a494";
+      x.fillRect(0, 0, S, S);
+      const c = S / 4;
+      for (let j = 0; j < 4; j++)
+        for (let i = 0; i < 4; i++) {
+          const g = x.createRadialGradient(
+            i * c + c / 2,
+            j * c + c / 2,
+            2,
+            i * c + c / 2,
+            j * c + c / 2,
+            c * 0.7,
+          );
+          g.addColorStop(0, "#c4c0ae");
+          g.addColorStop(1, "#6e6a5c");
+          x.fillStyle = g;
+          x.fillRect(i * c + 1, j * c + 1, c - 2, c - 2);
+        }
+      K.stains(x, 0, 0, S, S, 24, 111, 0.6, [70, 50, 30]);
+    },
+    celltile(x, S, r) {
+      // glazed institutional wall tile: green dado
+      x.fillStyle = "#b8b8a6";
+      x.fillRect(0, 0, S, S);
+      const c = S / 8;
+      for (let j = 0; j < 8; j++)
+        for (let i = 0; i < 8; i++) {
+          const v = 170 + r() * 30;
+          x.fillStyle =
+            "rgb(" +
+            ((v * 0.8) | 0) +
+            "," +
+            (v | 0) +
+            "," +
+            ((v * 0.85) | 0) +
+            ")";
+          x.fillRect(i * c + 1, j * c + 1, c - 2, c - 2);
+        }
+      K.stains(x, 0, 0, S, S, 20, 121, 0.55, [60, 50, 30]);
+      K.streaks(x, 0, 0, S, S, 20, 122, 0.3);
+    },
+    carpet(x, S, r) {
+      x.fillStyle = "#6a2020";
+      x.fillRect(0, 0, S, S);
+      x.strokeStyle = "#b08a40";
+      x.lineWidth = 3;
+      for (let j = 0; j < 4; j++)
+        for (let i = 0; i < 4; i++) {
+          const cx = (i * S) / 4 + S / 8,
+            cy = (j * S) / 4 + S / 8;
+          x.beginPath();
+          x.moveTo(cx, cy - S / 12);
+          x.lineTo(cx + S / 12, cy);
+          x.lineTo(cx, cy + S / 12);
+          x.lineTo(cx - S / 12, cy);
+          x.closePath();
+          x.stroke();
+        }
+      K.grain(x, 0, 0, S, S, 40, 131);
+      K.stains(x, 0, 0, S, S, 20, 132, 0.5, [30, 20, 10]);
+    },
+    // ---------------- poi_herald additions ----------------
+    deco_bays(x, S, r) {
+      // Hotel New Yorker façade: buff brick, 4 bays x 4 floors, deco spandrels, weathered windows
+      const B = S / 4;
+      // brick ground
+      x.fillStyle = "#b9a383";
+      x.fillRect(0, 0, S, S);
+      for (let j = 0; j < S; j += 8) {
+        x.fillStyle = "rgba(90,75,55,0.35)";
+        x.fillRect(0, j, S, 1.5);
+        const off = (j / 8) % 2 ? 0 : 12;
+        for (let i = off; i < S; i += 24) {
+          x.fillStyle = "rgba(90,75,55,0.3)";
+          x.fillRect(i, j, 1.5, 8);
+        }
+        for (let i = 0; i < S; i += 24) {
+          const v = r();
+          if (v < 0.25) {
+            x.fillStyle =
+              "rgba(" + (v < 0.12 ? "150,120,90" : "215,200,170") + ",0.35)";
+            x.fillRect(i + off + 1.5, j + 1.5, 22, 6.5);
+          }
+        }
+      }
+      for (let fy = 0; fy < 4; fy++)
+        for (let bx = 0; bx < 4; bx++) {
+          const X = bx * B,
+            Y = fy * B;
+          const wx = X + B * 0.25,
+            ww = B * 0.5,
+            wy = Y + B * 0.2,
+            wh = B * 0.62;
+          // spandrel under the window (runs into the next floor): recessed dark terracotta with chevrons
+          x.fillStyle = "#6e5a46";
+          x.fillRect(wx, wy + wh, ww, B - wh - B * 0.2 + B * 0.2);
+          x.strokeStyle = "rgba(200,180,140,0.45)";
+          x.lineWidth = 2;
+          for (let k = 0; k < 3; k++) {
+            const cy = wy + wh + 10 + k * 12;
+            x.beginPath();
+            x.moveTo(wx + 6, cy + 6);
+            x.lineTo(wx + ww / 2, cy - 2);
+            x.lineTo(wx + ww - 6, cy + 6);
+            x.stroke();
+          }
+          // window reveal
+          x.fillStyle = "#4a3e32";
+          x.fillRect(wx - 4, wy - 4, ww + 8, wh + 8);
+          const v = r();
+          if (v < 0.5) {
+            // dark glass with sky reflection
+            const g = x.createLinearGradient(wx, wy, wx + ww, wy + wh);
+            g.addColorStop(0, "#5d6b6c");
+            g.addColorStop(0.45, "#2a3334");
+            g.addColorStop(1, "#161c1d");
+            x.fillStyle = g;
+            x.fillRect(wx, wy, ww, wh);
+            x.fillStyle = "rgba(200,210,190,0.18)";
+            x.beginPath();
+            x.moveTo(wx, wy + wh * 0.3);
+            x.lineTo(wx + ww * 0.6, wy);
+            x.lineTo(wx + ww * 0.8, wy);
+            x.lineTo(wx, wy + wh * 0.5);
+            x.fill();
+          } else if (v < 0.72) {
+            // blown out
+            x.fillStyle = "#0c0b0a";
+            x.fillRect(wx, wy, ww, wh);
+            x.fillStyle = "rgba(120,130,125,0.55)";
+            for (let k = 0; k < 3; k++) {
+              x.beginPath();
+              const px = wx + r() * ww;
+              x.moveTo(px - 8, wy);
+              x.lineTo(px + 10, wy);
+              x.lineTo(px + r() * 6, wy + 10 + r() * 30);
+              x.fill();
+            }
+          } else if (v < 0.82) {
+            // boarded
+            x.fillStyle = "#6b563f";
+            x.fillRect(wx, wy, ww, wh);
+            for (let k = 0; k < 5; k++) {
+              x.fillStyle = k % 2 ? "#7e674c" : "#5c4a36";
+              x.fillRect(wx, wy + (k * wh) / 5, ww, wh / 5 - 2);
+            }
+          } else if (v < 0.92) {
+            // drawn blind / curtain
+            x.fillStyle = "#2a3232";
+            x.fillRect(wx, wy, ww, wh);
+            x.fillStyle = r() < 0.5 ? "#b8a27a" : "#8c5a44";
+            x.fillRect(wx, wy, ww, wh * (0.3 + r() * 0.5));
+          } else {
+            x.fillStyle = "#20262a";
+            x.fillRect(wx, wy, ww, wh);
+            x.fillStyle = "rgba(240,200,120,0.25)";
+            x.fillRect(wx + 4, wy + 4, ww - 8, wh - 8);
+          }
+          // mullion + transom
+          x.fillStyle = "#3c3228";
+          x.fillRect(wx + ww / 2 - 2, wy, 4, wh);
+          x.fillRect(wx, wy + wh * 0.62, ww, 4);
+          // limestone sill
+          x.fillStyle = "#cfc2a4";
+          x.fillRect(wx - 8, wy + wh + 2, ww + 16, 6);
+          // soot streak
+          const g2 = x.createLinearGradient(0, wy + wh, 0, wy + wh + B * 0.5);
+          g2.addColorStop(0, "rgba(30,24,18,0.35)");
+          g2.addColorStop(1, "rgba(30,24,18,0)");
+          x.fillStyle = g2;
+          x.fillRect(wx + ww * 0.2, wy + wh + 8, ww * 0.6, B * 0.5);
+        }
+      K.stains(x, 0, 0, S, S, 30, 1301, 0.35, [60, 45, 30]);
+      K.streaks(x, 0, 0, S, S, 40, 1302, 0.22);
+    },
+    steel_flute(x, S, r) {
+      // diner stainless: horizontal fluting
+      const n = 16,
+        h = S / n;
+      for (let j = 0; j < n; j++) {
+        const g = x.createLinearGradient(0, j * h, 0, j * h + h);
+        g.addColorStop(0, "#f2f4f4");
+        g.addColorStop(0.35, "#b8bec2");
+        g.addColorStop(0.6, "#7e868c");
+        g.addColorStop(0.85, "#d8dcde");
+        g.addColorStop(1, "#5a6166");
+        x.fillStyle = g;
+        x.fillRect(0, j * h, S, h);
+      }
+      for (let i = 0; i < 40; i++) {
+        const px = r() * S,
+          py = r() * S,
+          rad = 6 + r() * 40,
+          g = x.createRadialGradient(px, py, 0, px, py, rad);
+        g.addColorStop(
+          0,
+          "rgba(110,70,35," + (0.2 + r() * 0.3).toFixed(2) + ")",
+        );
+        g.addColorStop(1, "rgba(110,70,35,0)");
+        x.fillStyle = g;
+        x.fillRect(px - rad, py - rad, rad * 2, rad * 2);
+      }
+      K.streaks(x, 0, 0, S, S, 30, 1311, 0.18);
+    },
+    brushed(x, S, r) {
+      // brushed stainless / chrome panels (vertical brushing, panel seams, rivets)
+      x.fillStyle = "#b4babe";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 900; i++) {
+        x.fillStyle =
+          "rgba(" +
+          (r() < 0.5 ? "255,255,255" : "40,45,50") +
+          "," +
+          (r() * 0.08).toFixed(3) +
+          ")";
+        x.fillRect(r() * S, 0, 1, S);
+      }
+      x.fillStyle = "rgba(40,45,50,0.5)";
+      x.fillRect(0, 0, S, 3);
+      x.fillRect(0, 0, 3, S);
+      for (let i = 8; i < S; i += 32) {
+        x.fillStyle = "#6a7074";
+        x.beginPath();
+        x.arc(i, 8, 2.5, 0, 6.3);
+        x.fill();
+        x.beginPath();
+        x.arc(8, i, 2.5, 0, 6.3);
+        x.fill();
+      }
+      K.stains(x, 0, 0, S, S, 12, 1321, 0.3, [90, 60, 30]);
+    },
+    formica(x, S, r) {
+      // boomerang formica counter top
+      x.fillStyle = "#a8cfc4";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 70; i++) {
+        const px = r() * S,
+          py = r() * S,
+          a = r() * 6.3,
+          L = 14 + r() * 18;
+        x.strokeStyle = r.pick(["#d24a3a", "#2b4c6f", "#f0e0b0", "#c89a3a"]);
+        x.lineWidth = 3;
+        x.beginPath();
+        x.moveTo(px - Math.cos(a) * L, py - Math.sin(a) * L);
+        x.quadraticCurveTo(
+          px + Math.cos(a + 1.6) * L * 0.6,
+          py + Math.sin(a + 1.6) * L * 0.6,
+          px + Math.cos(a + 0.8) * L,
+          py + Math.sin(a + 0.8) * L,
+        );
+        x.stroke();
+      }
+      for (let i = 0; i < 400; i++) {
+        x.fillStyle = "rgba(255,255,255,0.35)";
+        x.fillRect(r() * S, r() * S, 1.5, 1.5);
+      }
+      K.stains(x, 0, 0, S, S, 18, 1331, 0.35, [80, 60, 30]);
+    },
+    parquet(x, S, r) {
+      // ballroom herringbone parquet
+      x.fillStyle = "#5a3a22";
+      x.fillRect(0, 0, S, S);
+      const w = S / 16,
+        l = w * 4;
+      for (let j = -2; j < 18; j++)
+        for (let i = -2; i < 10; i++) {
+          const ox = i * l + (j % 2) * w * 2,
+            oy = j * w * 2;
+          for (const flip of [0, 1]) {
+            x.save();
+            x.translate(ox + flip * w * 2, oy);
+            x.rotate(flip ? -Math.PI / 4 : Math.PI / 4);
+            const v = 120 + r() * 60;
+            x.fillStyle =
+              "rgb(" +
+              (v | 0) +
+              "," +
+              ((v * 0.7) | 0) +
+              "," +
+              ((v * 0.45) | 0) +
+              ")";
+            x.fillRect(0, 0, l, w - 1.5);
+            x.restore();
+          }
+        }
+      K.stains(x, 0, 0, S, S, 24, 1341, 0.5, [30, 18, 8]);
+    },
+    carpet_deco(x, S, r) {
+      // hotel corridor: burgundy with gold deco fans
+      x.fillStyle = "#5a1a1e";
+      x.fillRect(0, 0, S, S);
+      x.strokeStyle = "#b08a3e";
+      x.lineWidth = 3;
+      const c = S / 4;
+      for (let j = 0; j < 4; j++)
+        for (let i = 0; i < 4; i++) {
+          const cx = i * c + c / 2,
+            cy = j * c + c * 0.8;
+          for (let k = 0; k < 5; k++) {
+            const a = Math.PI + (k * Math.PI) / 4;
+            x.beginPath();
+            x.moveTo(cx, cy);
+            x.lineTo(cx + Math.cos(a) * c * 0.4, cy + Math.sin(a) * c * 0.4);
+            x.stroke();
+          }
+          x.beginPath();
+          x.arc(cx, cy, c * 0.4, Math.PI, 0);
+          x.stroke();
+          x.beginPath();
+          x.arc(cx, cy, c * 0.22, Math.PI, 0);
+          x.stroke();
+        }
+      x.fillStyle = "#2a0c0e";
+      x.fillRect(0, 0, S, S * 0.04);
+      x.fillRect(0, S * 0.96, S, S * 0.04);
+      K.grain(x, 0, 0, S, S, 40, 1351);
+      K.stains(x, 0, 0, S, S, 22, 1352, 0.5, [25, 15, 8]);
+    },
+    deco_wall(x, S, r) {
+      // lobby wall: veined rouge marble panels with bronze reeds
+      x.fillStyle = "#7a4a3a";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < 24; i++) {
+        const px = r() * S,
+          py = r() * S,
+          rad = 40 + r() * 120,
+          g = x.createRadialGradient(px, py, 0, px, py, rad);
+        const t = r() < 0.5 ? "150,95,70" : "90,50,40";
+        g.addColorStop(0, "rgba(" + t + ",0.5)");
+        g.addColorStop(1, "rgba(" + t + ",0)");
+        x.fillStyle = g;
+        x.fillRect(px - rad, py - rad, rad * 2, rad * 2);
+      }
+      for (let i = 0; i < 12; i++) {
+        x.strokeStyle =
+          "rgba(230,200,170," + (0.2 + r() * 0.3).toFixed(2) + ")";
+        x.lineWidth = 0.8 + r() * 1.4;
+        x.beginPath();
+        let px = r() * S,
+          py = r() * S;
+        x.moveTo(px, py);
+        for (let k = 0; k < 5; k++) {
+          px += (r() - 0.4) * 100;
+          py += (r() - 0.5) * 70;
+          x.lineTo(px, py);
+        }
+        x.stroke();
+      }
+      x.fillStyle = "#b89048";
+      x.fillRect(0, 0, 6, S);
+      x.fillRect(S / 2, 0, 3, S);
+      x.fillStyle = "rgba(0,0,0,0.3)";
+      x.fillRect(6, 0, 2, S);
+      K.stains(x, 0, 0, S, S, 10, 1361, 0.3);
+    },
+    subway_tile(x, S, r) {
+      // white glazed 3x6 tile (automat kitchen, diner kitchen)
+      x.fillStyle = "#6a6a62";
+      x.fillRect(0, 0, S, S);
+      const w = S / 8,
+        h = S / 16;
+      for (let j = 0; j < 16; j++)
+        for (let i = -1; i < 9; i++) {
+          const ox = i * w + ((j % 2) * w) / 2;
+          const v = 205 + r() * 30;
+          x.fillStyle =
+            "rgb(" + (v | 0) + "," + (v | 0) + "," + ((v * 0.95) | 0) + ")";
+          x.fillRect(ox + 1.5, j * h + 1.5, w - 3, h - 3);
+          x.fillStyle = "rgba(255,255,255,0.35)";
+          x.fillRect(ox + 3, j * h + 3, w - 6, 2);
+        }
+      K.stains(x, 0, 0, S, S, 22, 1371, 0.5, [70, 55, 30]);
+      K.streaks(x, 0, 0, S, S, 20, 1372, 0.25);
+    },
+    velvet(x, S, r) {
+      x.fillStyle = "#7a1c1c";
+      x.fillRect(0, 0, S, S);
+      for (let i = 0; i < S; i += 6) {
+        x.fillStyle =
+          "rgba(0,0,0," + (0.1 + 0.1 * Math.sin(i * 0.3)).toFixed(2) + ")";
+        x.fillRect(i, 0, 3, S);
+      }
+      K.grain(x, 0, 0, S, S, 30, 141);
+      K.stains(x, 0, 0, S, S, 12, 142, 0.4, [20, 10, 5]);
+    },
+  };

@@ -1,0 +1,413 @@
+/* src/weapons/weapons.css */
+/* NEW RAD CITY — weapons module: scope overlay (hunting/sniper rifles, scoped .44) */
+.wpn-scope {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  display: none;
+}
+.wpn-scope.on {
+  display: block;
+}
+/* black mask with a round eyepiece, slightly soft rim + lens vignette */
+.wpn-scope-ring {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 30vmin,
+    rgba(0, 0, 0, 0.35) 38vmin,
+    rgba(0, 0, 0, 0.9) 42vmin,
+    #000 43.5vmin,
+    #000 100%
+  );
+}
+/* thin crosshair with thicker outer posts (duplex reticle) */
+.wpn-scope-h,
+.wpn-scope-v {
+  position: absolute;
+  background: rgba(8, 10, 6, 0.92);
+}
+.wpn-scope-h {
+  left: calc(50% - 43vmin);
+  width: 86vmin;
+  top: calc(50% - 0.5px);
+  height: 1px;
+  box-shadow:
+    -30vmin 0 0 1.5px rgba(8, 10, 6, 0.92),
+    30vmin 0 0 1.5px rgba(8, 10, 6, 0.92);
+}
+.wpn-scope-v {
+  top: calc(50% - 43vmin);
+  height: 86vmin;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  box-shadow:
+    0 30vmin 0 1.5px rgba(8, 10, 6, 0.92),
+    0 -30vmin 0 1.5px rgba(8, 10, 6, 0.92);
+}
+/* range-finder post and mil-dots */
+.wpn-scope-post {
+  position: absolute;
+  left: calc(50% - 1px);
+  top: 50%;
+  width: 2px;
+  height: 12vmin;
+  background: rgba(8, 10, 6, 0.9);
+}
+.wpn-scope-dots {
+  position: absolute;
+  left: calc(50% - 16vmin);
+  top: calc(50% - 1.5px);
+  width: 32vmin;
+  height: 3px;
+  background: radial-gradient(
+      circle,
+      rgba(8, 10, 6, 0.95) 1.4px,
+      transparent 1.6px
+    )
+    0 0 / 4vmin 3px repeat-x;
+}
+/* faint green-amber lens tint & glint */
+.wpn-scope-glint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 84vmin;
+  height: 84vmin;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    rgba(255, 255, 230, 0.07),
+    rgba(120, 160, 90, 0.05) 40%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+}
+/* hold-breath meter (Shift while scoped): thin cyan-white bar under the reticle (goggle HUD palette) */
+.wpn-scope-breath {
+  position: absolute;
+  left: calc(50% + 7vmin);
+  top: calc(50% + 22vmin);
+  width: 16vmin;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 0.25s;
+  font:
+    11px "Share Tech Mono",
+    monospace;
+  letter-spacing: 2px;
+  color: rgba(207, 238, 250, 0.85);
+  text-shadow: 0 0 4px rgba(150, 220, 240, 0.6);
+}
+.wpn-scope-breath.on {
+  opacity: 1;
+}
+.wpn-scope-breath span {
+  display: block;
+  margin-bottom: 3px;
+}
+.wpn-scope-breath i {
+  display: block;
+  height: 3px;
+  background: rgba(207, 238, 250, 0.85);
+  box-shadow: 0 0 6px rgba(150, 220, 240, 0.7);
+}
+.wpn-scope-breath.winded {
+  color: rgba(255, 179, 71, 0.9);
+}
+.wpn-scope-breath.winded i {
+  background: rgba(255, 179, 71, 0.9);
+  box-shadow: 0 0 6px rgba(255, 150, 60, 0.6);
+}
+
+/* ---------------------------------------------------------------------------
+ * Workbench (crafting / weapon mods): goggle-style CRT panel, follows the UI theme
+ * (--uix-g / --uix-g-rgb from ui_interact; falls back to pale cyan-white #cfeefa)
+ * ------------------------------------------------------------------------- */
+.wpn-craft {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(4, 10, 16, 0.55),
+    rgba(0, 0, 0, 0.82)
+  );
+  --wc: var(--uix-g, #cfeefa);
+  --wc-rgb: var(--uix-g-rgb, 207, 238, 250);
+  font-family: var(--uix-font, "Share Tech Mono", "VT323", monospace);
+  color: var(--wc);
+}
+.wpn-craft.on {
+  display: flex;
+  animation: wpnCraftIn 0.18s ease-out;
+}
+@keyframes wpnCraftIn {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: brightness(2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.wpn-craft-box {
+  position: relative;
+  width: min(1040px, 92vw);
+  height: min(640px, 86vh);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 26px 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 50% 40%,
+      rgba(var(--wc-rgb), 0.07),
+      rgba(2, 8, 14, 0.95) 70%
+    ),
+    #02070c;
+  border: 2px solid rgba(var(--wc-rgb), 0.55);
+  border-radius: 18px;
+  box-shadow:
+    0 0 40px rgba(var(--wc-rgb), 0.18),
+    inset 0 0 80px rgba(0, 0, 0, 0.85),
+    inset 0 0 12px rgba(var(--wc-rgb), 0.25);
+  text-shadow: 0 0 6px rgba(var(--wc-rgb), 0.55);
+}
+.wpn-craft-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 16px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.22) 0 1px,
+    transparent 1px 3px
+  );
+  animation: wpnCraftFlicker 4s infinite steps(1);
+}
+@keyframes wpnCraftFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  47% {
+    opacity: 0.92;
+  }
+  48% {
+    opacity: 1;
+  }
+  83% {
+    opacity: 0.95;
+  }
+}
+.wpn-craft-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 26px;
+  letter-spacing: 6px;
+  border-bottom: 2px solid rgba(var(--wc-rgb), 0.6);
+  padding-bottom: 6px;
+}
+.wpn-craft-skill {
+  font-size: 15px;
+  letter-spacing: 2px;
+  opacity: 0.85;
+}
+.wpn-craft-tabs {
+  display: flex;
+  gap: 26px;
+  margin: 10px 0 8px;
+  font-size: 17px;
+  letter-spacing: 3px;
+}
+.wpn-craft-tabs b {
+  font-weight: normal;
+  cursor: pointer;
+  opacity: 0.55;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+}
+.wpn-craft-tabs b.on {
+  opacity: 1;
+  border: 1px solid rgba(var(--wc-rgb), 0.7);
+  background: rgba(var(--wc-rgb), 0.08);
+}
+.wpn-craft-body {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  min-height: 0;
+}
+.wpn-craft-list {
+  flex: 0 0 44%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  font-size: 17px;
+  scrollbar-width: none;
+}
+.wpn-craft-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.wpn-craft-list li i {
+  font-style: normal;
+  opacity: 0.75;
+  font-size: 13px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.wpn-craft-list li.dim {
+  opacity: 0.5;
+}
+.wpn-craft-list li.sel {
+  background: rgba(var(--wc-rgb), 0.9);
+  color: #04121a;
+  text-shadow: none;
+  opacity: 1;
+}
+.wpn-craft-list li.empty {
+  cursor: default;
+  opacity: 0.7;
+  line-height: 1.5;
+  font-size: 15px;
+}
+.wpn-craft-info {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 15px;
+  scrollbar-width: none;
+}
+.wpn-craft-info h3 {
+  margin: 2px 0 8px;
+  font-size: 22px;
+  font-weight: normal;
+  letter-spacing: 3px;
+}
+.wpn-craft-info h4 {
+  margin: 12px 0 4px;
+  font-weight: normal;
+  font-size: 14px;
+  letter-spacing: 3px;
+  opacity: 0.8;
+  border-bottom: 1px solid rgba(var(--wc-rgb), 0.35);
+}
+.wpn-craft-note {
+  margin: 0 0 8px;
+  line-height: 1.45;
+  opacity: 0.88;
+}
+.wpn-craft-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+.wpn-craft-stats span {
+  border: 1px solid rgba(var(--wc-rgb), 0.5);
+  padding: 1px 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.wpn-craft-cnd {
+  margin: 6px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wpn-craft-cnd .bar {
+  display: inline-block;
+  width: 120px;
+  height: 8px;
+  border: 1px solid var(--wc);
+}
+.wpn-craft-cnd .bar i {
+  display: block;
+  height: 100%;
+  background: var(--wc);
+}
+.wpn-craft-cnd em {
+  font-style: normal;
+  opacity: 0.7;
+}
+.wpn-craft-parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wpn-craft-parts li {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+}
+.wpn-craft-parts li i {
+  font-style: normal;
+}
+.wpn-craft-parts li.no {
+  opacity: 0.45;
+}
+.wpn-craft-req {
+  margin: 8px 0;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+.wpn-craft-req.no {
+  color: #ff5a4a;
+  text-shadow: 0 0 6px rgba(255, 90, 74, 0.5);
+}
+.wpn-craft-info button {
+  margin-top: 10px;
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: 4px;
+  color: #04121a;
+  background: var(--wc);
+  border: 0;
+  padding: 6px 22px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(var(--wc-rgb), 0.5);
+}
+.wpn-craft-info button.off {
+  background: transparent;
+  color: var(--wc);
+  border: 1px dashed rgba(var(--wc-rgb), 0.6);
+  box-shadow: none;
+  opacity: 0.7;
+  cursor: default;
+}
+.wpn-craft-msg {
+  min-height: 20px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-top: 6px;
+}
+.wpn-craft-foot {
+  border-top: 2px solid rgba(var(--wc-rgb), 0.6);
+  padding-top: 6px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  opacity: 0.85;
+}
+.wpn-craft-foot b {
+  border: 1px solid var(--wc);
+  padding: 0 5px;
+  font-weight: normal;
+}

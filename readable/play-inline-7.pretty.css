@@ -1,0 +1,215 @@
+/* src/quests_extra/quests_extra.css */
+/* quests_extra — tiny overlays (camera flash / viewfinder, fortune card). Prefix: qx- */
+.qx-flash {
+  position: fixed;
+  inset: 0;
+  background: #fffdf2;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 880;
+  transition: opacity 0.5s ease-out;
+}
+.qx-viewfinder {
+  position: fixed;
+  inset: 12vh 18vw;
+  pointer-events: none;
+  z-index: 879;
+  opacity: 0;
+  transition: opacity 0.15s ease-in;
+  --qx-c: var(--hud-c, #cfeefa);
+}
+.qx-viewfinder.on {
+  opacity: 1;
+}
+.qx-viewfinder i {
+  position: absolute;
+  width: 7vh;
+  height: 7vh;
+  border: 3px solid var(--qx-c);
+  filter: drop-shadow(0 0 6px var(--hud-glow, rgba(150, 220, 240, 0.55)));
+}
+.qx-viewfinder i:nth-child(1) {
+  left: 0;
+  top: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.qx-viewfinder i:nth-child(2) {
+  right: 0;
+  top: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+.qx-viewfinder i:nth-child(3) {
+  left: 0;
+  bottom: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.qx-viewfinder i:nth-child(4) {
+  right: 0;
+  bottom: 0;
+  border-left: 0;
+  border-top: 0;
+}
+.qx-viewfinder b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4vh;
+  height: 4vh;
+  margin: -2vh 0 0 -2vh;
+  border: 2px solid var(--qx-c);
+  border-radius: 50%;
+  opacity: 0.8;
+}
+.qx-viewfinder span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4.5vh;
+  text-align: center;
+  color: var(--qx-c);
+  font:
+    2.2vh "Share Tech Mono",
+    "VT323",
+    monospace;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 6px var(--hud-glow, rgba(150, 220, 240, 0.55));
+}
+
+/* Fingers Fiorello's three-card monte (state 'qx_monte') — a felt table under the goggles' cyan-white readout frame */
+.qx-monte {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.82)
+  );
+}
+.qx-monte-panel {
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  padding: 18px 18px 14px;
+  border: 1px solid var(--hud-dim, rgba(150, 220, 240, 0.35));
+  background: rgba(8, 14, 18, 0.9);
+  box-shadow:
+    0 0 22px rgba(150, 220, 240, 0.18),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+  color: var(--hud-c, #cfeefa);
+  font:
+    16px "Share Tech Mono",
+    "VT323",
+    monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px var(--hud-glow, rgba(150, 220, 240, 0.5));
+}
+.qx-monte-title {
+  font-size: 20px;
+  letter-spacing: 0.16em;
+  text-align: center;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 6px;
+}
+.qx-monte-bet {
+  text-align: center;
+  margin: 8px 0;
+  opacity: 0.85;
+}
+.qx-monte-table {
+  position: relative;
+  height: 170px;
+  margin: 6px 0 10px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(45deg, #1f3a26 0 6px, #1c3522 6px 12px);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.8);
+}
+.qx-monte-card {
+  position: absolute;
+  top: 18px;
+  width: 104px;
+  height: 134px;
+  border-radius: 7px;
+  perspective: 600px;
+}
+.qx-monte-card > div {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  backface-visibility: hidden;
+  transition: transform 0.35s ease;
+}
+.qx-card-face {
+  background: #efe6cf;
+  color: #b0201a;
+  border: 2px solid #9a8d70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-shadow: none;
+}
+.qx-card-face b {
+  font:
+    bold 44px Georgia,
+    serif;
+  line-height: 1;
+}
+.qx-card-face span {
+  font-size: 36px;
+}
+.qx-card-back {
+  background: repeating-linear-gradient(
+    135deg,
+    #7a1c1a 0 5px,
+    #5a1210 5px 10px
+  );
+  border: 3px solid #d8c8a0;
+  transform: rotateY(180deg);
+}
+.qx-monte-card.down .qx-card-face {
+  transform: rotateY(180deg);
+}
+.qx-monte-card.down .qx-card-back {
+  transform: rotateY(0deg);
+}
+.qx-monte-card.pick {
+  cursor: pointer;
+}
+.qx-monte-card.pick:hover {
+  filter: drop-shadow(0 0 8px var(--hud-c, #cfeefa));
+}
+.qx-monte-msg {
+  min-height: 40px;
+  text-align: center;
+}
+.qx-monte-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.qx-monte-btn {
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  font: inherit;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.qx-monte-btn:hover {
+  background: var(--hud-c, #cfeefa);
+  color: #081014;
+  text-shadow: none;
+}
+
+/* [Senses] hunch: the card the player has a feeling about glows faintly (amber) */
+.qx-monte-card.hunch.pick {
+  box-shadow: 0 0 14px 3px rgba(255, 179, 71, 0.55);
+}

@@ -1,0 +1,808 @@
+/* src/arcade/arcade.css */
+/* =====================================================================
+ * arcade — cabinet screen + collections ledger (prefix arc-)
+ * Cabinet: an upright arcade cabinet front (lit marquee, dark bezel,
+ * full-colour monitor with mild scanlines and a curved-glass reflection,
+ * control panel, coin door). Three cabinet styles: wood / chrome / space.
+ * Ledger: the goggles' look (cyan-white #cfeefa, dim rules, amber accents).
+ * ===================================================================== */
+.arc-hidden {
+  display: none !important;
+}
+@keyframes arc-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes arc-blink {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------------------------------------------------------------- cabinet */
+.arc-cabview {
+  position: fixed;
+  inset: 0;
+  z-index: 325;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(10, 8, 14, 0.72) 0%,
+    rgba(0, 0, 0, 0.95) 75%
+  );
+  animation: arc-in 0.22s ease-out;
+}
+.arc-cab {
+  --side: #3a2414;
+  --trim: #e8dcc0;
+  --face: #141010;
+  --accent: #ffb347;
+  position: relative;
+  width: min(860px, 94vw, calc(94vh * 0.95));
+  height: min(94vh, 960px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0 26px 14px;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(
+    90deg,
+    var(--side) 0 22px,
+    var(--face) 22px calc(100% - 22px),
+    var(--side) calc(100% - 22px)
+  );
+  box-shadow:
+    0 0 0 3px var(--trim),
+    0 30px 80px rgba(0, 0, 0, 0.9),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+}
+.arc-style-wood {
+  --trim: #e8dcc0;
+  --face: #17110c;
+  --accent: #ff7a3a;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 22px,
+      var(--face) 22px calc(100% - 22px),
+      transparent calc(100% - 22px)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      #4a2c16 0 3px,
+      #5a361c 3px 7px,
+      #432812 7px 9px
+    );
+}
+.arc-style-chrome {
+  --trim: #d8dde2;
+  --face: #0c0c0e;
+  --accent: #ffd23a;
+  background: linear-gradient(
+    90deg,
+    #1a1a1d 0 18px,
+    #c8ccd2 18px 22px,
+    var(--face) 22px calc(100% - 22px),
+    #c8ccd2 calc(100% - 22px) calc(100% - 18px),
+    #1a1a1d calc(100% - 18px)
+  );
+}
+.arc-style-space {
+  --trim: #ff4a8a;
+  --face: #0a0c22;
+  --accent: #5fe0ff;
+  background:
+    radial-gradient(
+      circle at 12% 30%,
+      rgba(255, 255, 255, 0.5) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 88% 62%,
+      rgba(255, 255, 255, 0.45) 0 1px,
+      transparent 2px
+    ),
+    linear-gradient(
+      90deg,
+      #1b1f5a 0 22px,
+      var(--face) 22px calc(100% - 22px),
+      #1b1f5a calc(100% - 22px)
+    );
+}
+
+.arc-marquee {
+  flex: 0 0 auto;
+  margin: 0 -26px;
+  padding: 10px 14px;
+  background: #050505;
+  border-bottom: 4px solid var(--trim);
+  border-radius: 10px 10px 0 0;
+}
+.arc-marquee canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 640 / 120;
+  height: auto;
+  border-radius: 3px;
+  box-shadow:
+    0 0 22px rgba(255, 220, 160, 0.35),
+    inset 0 0 8px rgba(0, 0, 0, 0.5);
+  filter: saturate(1.1) brightness(1.08);
+}
+
+.arc-bezel {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 14px;
+  padding: 4.5% 6%;
+  border-radius: 6px;
+  display: flex;
+  background: linear-gradient(180deg, #0d0d0f, #050506 60%, #0d0d0f);
+  box-shadow:
+    inset 0 0 0 2px #222,
+    inset 0 6px 18px rgba(0, 0, 0, 0.9);
+}
+.arc-monitor {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 22px / 18px;
+  background: #000;
+  box-shadow:
+    0 0 0 3px #000,
+    0 0 0 6px #1d1d20,
+    inset 0 0 50px rgba(0, 0, 0, 0.95);
+}
+.arc-monitor canvas {
+  display: block;
+  border-radius: 16px / 13px;
+  image-rendering: auto;
+  filter: saturate(1.15) contrast(1.05);
+}
+.arc-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0 2px,
+    rgba(0, 0, 0, 0.16) 2px 3px
+  );
+}
+.arc-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse at 24% 12%,
+      rgba(255, 255, 255, 0.13),
+      rgba(255, 255, 255, 0) 38%
+    ),
+    linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0) 52%,
+      rgba(255, 255, 255, 0.05) 56%,
+      rgba(255, 255, 255, 0) 64%
+    ),
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(0, 0, 0, 0) 62%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.arc-cpanel {
+  flex: 0 0 auto;
+  position: relative;
+  margin: 14px -26px 0;
+  padding: 14px 28px 12px 150px;
+  min-height: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  align-items: center;
+  justify-content: flex-start;
+  border-top: 4px solid var(--trim);
+  background: linear-gradient(180deg, #2a2a30, #18181c);
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.08),
+    0 6px 14px rgba(0, 0, 0, 0.6);
+  font:
+    13px/1.3 "Share Tech Mono",
+    monospace;
+  letter-spacing: 1px;
+  color: #e8e2d4;
+}
+.arc-stick {
+  position: absolute;
+  left: 34px;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  margin-top: -19px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #111 0 30%, #2b2b2b 31%);
+}
+.arc-stick i {
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff9a8a, #d8261c 55%, #7a0c08);
+  box-shadow:
+    0 6px 0 -3px #333,
+    0 3px 6px rgba(0, 0, 0, 0.6);
+}
+.arc-btns {
+  position: absolute;
+  left: 86px;
+  top: 50%;
+  margin-top: -11px;
+  display: flex;
+  gap: 6px;
+}
+.arc-btns i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    0 2px 3px rgba(0, 0, 0, 0.6);
+}
+.arc-btns .b1 {
+  background: #ffd23a;
+}
+.arc-btns .b2 {
+  background: #5fe0ff;
+}
+.arc-btns .b3 {
+  background: #ff4a8a;
+}
+.arc-legend {
+  display: contents;
+}
+.arc-legend span {
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.arc-coin {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+  margin-top: 12px;
+  font:
+    12px "Share Tech Mono",
+    monospace;
+  letter-spacing: 2px;
+  color: #ddd;
+}
+.arc-slot {
+  padding: 4px 9px;
+  border-radius: 2px;
+  background: #3a0606;
+  color: #ff5a4a;
+  box-shadow:
+    0 0 10px rgba(255, 60, 40, 0.55),
+    inset 0 0 0 2px #1a1a1a;
+  text-shadow: 0 0 6px #ff3a2a;
+}
+.arc-credit {
+  color: var(--accent);
+  letter-spacing: 3px;
+  animation: arc-blink 1.6s infinite steps(1);
+}
+
+/* ---------------------------------------------------------------- ledger (goggles look) */
+.arc-ledger {
+  position: fixed;
+  inset: 0;
+  z-index: 325;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(18, 30, 40, 0.62) 0%,
+    rgba(4, 8, 12, 0.9) 85%
+  );
+  color: #cfeefa;
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  text-transform: uppercase;
+  --arc-c: #cfeefa;
+  --arc-glow: rgba(150, 220, 240, 0.45);
+  --arc-dim: rgba(150, 220, 240, 0.35);
+  --arc-amber: #ffb347;
+  --arc-red: #ff5a4a;
+  animation: arc-in 0.25s ease-out;
+}
+.arc-frame {
+  position: relative;
+  width: min(1180px, 96vw);
+  height: min(840px, 94vh);
+  box-sizing: border-box;
+  padding: 26px 34px 14px;
+  display: flex;
+  flex-direction: column;
+  text-shadow:
+    0 0 4px var(--arc-glow),
+    0 0 12px rgba(150, 220, 240, 0.18);
+}
+.arc-corner {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--arc-c);
+  opacity: 0.8;
+}
+.arc-corner.tl {
+  left: 0;
+  top: 0;
+  border-right: none;
+  border-bottom: none;
+}
+.arc-corner.tr {
+  right: 0;
+  top: 0;
+  border-left: none;
+  border-bottom: none;
+}
+.arc-corner.bl {
+  left: 0;
+  bottom: 0;
+  border-right: none;
+  border-top: none;
+}
+.arc-corner.br {
+  right: 0;
+  bottom: 0;
+  border-left: none;
+  border-top: none;
+}
+.arc-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14%;
+  pointer-events: none;
+  animation: arc-sweep 6s linear infinite;
+  background: linear-gradient(
+    to bottom,
+    rgba(150, 220, 240, 0),
+    rgba(150, 220, 240, 0.05),
+    rgba(150, 220, 240, 0)
+  );
+}
+@keyframes arc-sweep {
+  from {
+    top: -16%;
+  }
+  to {
+    top: 104%;
+  }
+}
+
+.arc-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 22px;
+  border-bottom: 1px solid var(--arc-dim);
+  padding-bottom: 8px;
+  flex: 0 0 auto;
+}
+.arc-title {
+  font-size: 22px;
+  letter-spacing: 4px;
+  white-space: nowrap;
+}
+.arc-tabs {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+.arc-tab {
+  font-size: 16px;
+  letter-spacing: 3px;
+  padding: 4px 12px 3px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.arc-tab:hover {
+  opacity: 0.9;
+}
+.arc-tab.on {
+  border-color: var(--arc-dim);
+  opacity: 1;
+  background: rgba(150, 220, 240, 0.07);
+}
+.arc-tab.on::before {
+  content: "[ ";
+}
+.arc-tab.on::after {
+  content: " ]";
+}
+.arc-meta {
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+
+.arc-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 14px;
+  overflow: hidden;
+}
+.arc-cols {
+  display: flex;
+  gap: 28px;
+  height: 100%;
+}
+.arc-left {
+  flex: 0 0 34%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.arc-rightcol {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.arc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.arc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  font-size: 15px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.arc-item:hover {
+  border-color: var(--arc-dim);
+}
+.arc-item.sel {
+  border-color: var(--arc-c);
+  background: rgba(150, 220, 240, 0.1);
+  box-shadow: 0 0 10px -2px var(--arc-glow) inset;
+}
+.arc-item.off {
+  opacity: 0.5;
+}
+.arc-mark {
+  width: 16px;
+  text-align: center;
+  flex: 0 0 16px;
+}
+.arc-lbl {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.arc-right {
+  opacity: 0.9;
+  color: var(--arc-amber);
+}
+.arc-count {
+  margin-top: 16px;
+  font-size: 15px;
+  letter-spacing: 3px;
+}
+.arc-gtitle {
+  font-size: 22px;
+  letter-spacing: 4px;
+  margin-top: 10px;
+}
+.arc-gsub {
+  font-size: 14px;
+  letter-spacing: 3px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+.arc-maker {
+  font-size: 11px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-top: 3px;
+}
+.arc-text {
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 640px;
+  margin-top: 10px;
+  text-align: left;
+  opacity: 0.92;
+  text-transform: none;
+}
+.arc-goal {
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  align-self: stretch;
+  text-align: left;
+}
+.arc-goal.done {
+  color: var(--arc-amber);
+}
+.arc-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+.arc-scores {
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: 15px;
+  min-width: 280px;
+}
+.arc-scores th {
+  font-weight: normal;
+  letter-spacing: 3px;
+  border-bottom: 1px solid var(--arc-dim);
+  padding-bottom: 3px;
+}
+.arc-scores td {
+  padding: 1px 10px;
+  text-align: left;
+}
+.arc-scores td.r {
+  text-align: right;
+}
+.arc-scores tr.mine td {
+  color: var(--arc-amber);
+}
+.arc-sect {
+  margin-top: 14px;
+  font-size: 14px;
+  letter-spacing: 3px;
+  border-bottom: 1px solid var(--arc-dim);
+  align-self: stretch;
+  text-align: left;
+  padding-bottom: 2px;
+}
+.arc-rw {
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+  text-align: left;
+  align-self: stretch;
+  margin-top: 4px;
+  opacity: 0.55;
+}
+.arc-rw.got {
+  opacity: 1;
+}
+.arc-quest {
+  margin-top: 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  align-self: stretch;
+  text-align: left;
+}
+.arc-quest b {
+  font-weight: normal;
+  padding: 0 6px;
+  margin-right: 4px;
+  border: 1px solid var(--arc-amber);
+  color: var(--arc-amber);
+}
+.arc-miniwrap {
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: center;
+}
+.arc-miniwrap canvas {
+  width: min(240px, 30vh);
+  height: min(240px, 30vh);
+}
+.arc-artwrap {
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+}
+.arc-artwrap canvas {
+  width: min(480px, 100%);
+  height: auto;
+  aspect-ratio: 480 / 90;
+  border: 1px solid var(--arc-dim);
+}
+
+/* Keys to the City: the Mayor's register */
+.arc-qwrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.arc-qhead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  letter-spacing: 3px;
+}
+.arc-det {
+  margin-top: 6px;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--arc-amber);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.5);
+  animation: arc-blink 2s infinite steps(1);
+}
+.arc-qrow {
+  display: flex;
+  gap: 22px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 8px;
+}
+.arc-qleft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.arc-kleft {
+  flex: 0 0 42%;
+  overflow: hidden;
+}
+.arc-kleft .arc-item {
+  font-size: 12.5px;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+}
+.arc-kright {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+}
+.arc-kcard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.arc-kcard .arc-gtitle {
+  margin-top: 2px;
+  font-size: 18px;
+}
+.arc-kcard .arc-text {
+  margin-top: 4px;
+  font-size: 12.5px;
+}
+.arc-kcard .arc-text b {
+  font-weight: normal;
+  color: var(--arc-amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+.arc-key {
+  height: 30px;
+  width: auto;
+}
+.arc-key .arc-kb,
+.arc-key .arc-kc,
+.arc-key .arc-ks,
+.arc-key .arc-kt {
+  fill: rgba(150, 220, 240, 0.08);
+  stroke: var(--arc-c);
+  stroke-width: 1;
+}
+.arc-key .arc-kh {
+  fill: #040a0e;
+  stroke: var(--arc-c);
+  stroke-width: 0.8;
+}
+.arc-kcard.lit .arc-key .arc-kb,
+.arc-kcard.lit .arc-key .arc-kc,
+.arc-kcard.lit .arc-key .arc-ks,
+.arc-kcard.lit .arc-key .arc-kt {
+  fill: #e0b04a;
+  fill-opacity: 0.75;
+  filter: drop-shadow(0 0 4px rgba(255, 200, 90, 0.55));
+}
+.arc-qmapwrap {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  max-height: 420px;
+  aspect-ratio: 340 / 400;
+  align-self: flex-start;
+  border: 1px solid var(--arc-dim);
+  box-shadow: 0 0 14px -4px var(--arc-glow) inset;
+  background: #040a0e;
+}
+.arc-qmapwrap.arc-kmap {
+  height: auto;
+  width: min(100%, 340px);
+  aspect-ratio: 340 / 280;
+  max-height: 280px;
+  margin-top: 8px;
+}
+.arc-qmapwrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.arc-prevlbl {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 1px 5px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.arc-foot {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  justify-content: center;
+  border-top: 1px solid var(--arc-dim);
+  margin-top: 8px;
+  padding-top: 6px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.85;
+}
+
+@media (max-height: 700px) {
+  .arc-text {
+    font-size: 12px;
+  }
+  .arc-scores {
+    font-size: 13px;
+  }
+  .arc-cpanel {
+    padding-left: 130px;
+    font-size: 11px;
+  }
+}

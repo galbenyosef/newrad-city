@@ -1,0 +1,41 @@
+/* src/poi_fidi3/pf3.css */
+/* poi_fidi3 — Bankers Trust heist countdown (VIGIL goggle readout: pale cyan CRT text, hard brackets) */
+.pf3-heist {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  pointer-events: none;
+  display: none;
+  padding: 6px 18px 8px;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--hud-c, #cfeefa);
+  font-family: "Share Tech Mono", "Major Mono Display", monospace;
+  text-shadow: 0 0 6px rgba(150, 220, 240, 0.55);
+  border-left: 2px solid var(--hud-dim, rgba(150, 220, 240, 0.35));
+  border-right: 2px solid var(--hud-dim, rgba(150, 220, 240, 0.35));
+  background: rgba(8, 16, 22, 0.55);
+}
+.pf3-heist-t {
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  opacity: 0.85;
+}
+.pf3-heist-c {
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: 0.08em;
+}
+.pf3-heist.pf3-heist-warn {
+  color: #ff5a4a;
+  border-color: #a8321e;
+  text-shadow: 0 0 8px rgba(255, 90, 74, 0.7);
+  animation: pf3-blink 0.5s steps(2, end) infinite;
+}
+@keyframes pf3-blink {
+  50% {
+    opacity: 0.45;
+  }
+}

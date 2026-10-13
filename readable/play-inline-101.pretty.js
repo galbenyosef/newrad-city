@@ -1,0 +1,461 @@
+/* src/map/60_subway.js */
+/* =====================================================================
+ * NEW RAD CITY — MAP MODULE · 60 SUBWAY (Times Sq – 42 St) — street side
+ * Street entrances near Times Square: open stairwells cut into the
+ * sidewalk (walkable first flight, iron railings, granite coping, green
+ * globe lamps, SUBWAY signage, a rusted gate + door at the landing).
+ * Shared with the station (60_subway_interior.js): the subway tile & sign
+ * atlases and the sign emitter M.subwaySign. The station cell and the
+ * entrance <-> mezzanine doors live in 60_subway_interior.js (M.buildSubway
+ * calls M.buildSubwayEntrances first).
+ * ===================================================================== */
+(function () {
+  "use strict";
+  const G = window.G;
+  const THREE = window.THREE;
+  const M = G.map._;
+  const LAYER = "subway"; // default layer of the shared sign emitter (the station cell)
+  M.anchors = M.anchors || {};
+
+  // -------------------------------------------------------------------
+  // Street entrances (planned before the ground is built)
+  // -------------------------------------------------------------------
+  // cx,cz = centre of the opening; the stairs descend toward -x from the east end (top).
+  M.subwayEntrances = [
+    { id: "ts_north", cx: -62, cz: -224.45, len: 8.6, w: 2.7 },
+    { id: "ts_west", cx: -102.5, cz: -224.45, len: 8.6, w: 2.7 },
+  ];
+  const LANDING = 3.8,
+    LAND_END = 5.3,
+    DEPTH1 = -1.1,
+    DEPTH2 = -4.4;
+  M.subwayHoles = function () {
+    return M.subwayEntrances.map((e) => [
+      [e.cx - e.len / 2, e.cz - e.w / 2],
+      [e.cx + e.len / 2, e.cz - e.w / 2],
+      [e.cx + e.len / 2, e.cz + e.w / 2],
+      [e.cx - e.len / 2, e.cz + e.w / 2],
+    ]);
+  };
+  /** Terrain height inside a stairwell: sloped first flight, flat landing. */
+  M.stairHeight = function (x, z) {
+    for (const e of M.subwayEntrances) {
+      if (
+        Math.abs(z - e.cz) > e.w / 2 + 0.6 ||
+        x < e.cx - e.len / 2 - 0.6 ||
+        x > e.cx + e.len / 2 + 0.6
+      )
+        continue;
+      const t = e.cx + e.len / 2 - x; // distance down the stairs from the top
+      if (t <= 0) return 0.12;
+      if (t < LANDING) return 0.12 + (DEPTH1 - 0.12) * (t / LANDING);
+      return DEPTH1;
+    }
+    return 0;
+  };
+
+  // -------------------------------------------------------------------
+  // Atlases: subway tiles (repeating) & subway signs
+  // -------------------------------------------------------------------
+  M.defineAtlas("subwaytile", function () {
+    const S2 = 256,
+      cv = M.canvas(S2, S2),
+      ctx = cv.getContext("2d");
+    const r = M.rng("subwaytile");
+    ctx.fillStyle = "#6d6a60";
+    ctx.fillRect(0, 0, S2, S2);
+    const tw = S2 / 8,
+      th = S2 / 16;
+    for (let j = 0; j < 16; j++)
+      for (let i = 0; i < 8; i++) {
+        const off = ((j % 2) * tw) / 2;
+        const v = (200 + r() * 30) | 0;
+        ctx.fillStyle =
+          r() < 0.04
+            ? "#3a3a34"
+            : "rgb(" + v + "," + (v - 4) + "," + (v - 16) + ")";
+        ctx.fillRect(i * tw + off + 1, j * th + 1, tw - 2, th - 2);
+        ctx.fillRect(i * tw + off + 1 - S2, j * th + 1, tw - 2, th - 2);
+      }
+    // grime gradient & streaks
+    const g = ctx.createLinearGradient(0, 0, 0, S2);
+    g.addColorStop(0, "rgba(40,36,28,0.15)");
+    g.addColorStop(1, "rgba(40,36,28,0.45)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, S2, S2);
+    for (let k = 0; k < 30; k++) {
+      ctx.fillStyle = "rgba(60,45,25," + r() * 0.25 + ")";
+      ctx.fillRect(r() * S2, r() * S2 * 0.3, 1 + r() * 3, 40 + r() * 200);
+    }
+    const t = M.finishTex(new THREE.CanvasTexture(cv));
+    return { texture: t, roughness: 0.45 };
+  });
+  const SSIGNS = [
+    "TIMES SQ — 42 ST",
+    "UPTOWN & THE BRONX",
+    "DOWNTOWN & BROOKLYN",
+    "TOKENS",
+    "SUBWAY",
+    "EXIT TO 42 ST",
+    "NO SMOKING · NO SPITTING",
+    "MAINTENANCE — KEEP OUT",
+    "TO ALL TRAINS",
+    "42",
+    "TIMES SQ",
+    "SHELTER — CAPACITY 200",
+  ];
+  M.defineAtlas("subwaysigns", function () {
+    const cols = 2,
+      rows = 8,
+      CW = 512,
+      CH = 128;
+    const cv = M.canvas(cols * CW, rows * CH),
+      ctx = cv.getContext("2d");
+    const r = M.rng("ssigns");
+    SSIGNS.forEach((txt, i) => {
+      const x = (i % cols) * CW,
+        y = Math.floor(i / cols) * CH;
+      if (i === 0 || i === 9 || i === 10) {
+        // mosaic tablet: tesserae border, cream field, dark lettering
+        for (let yy = 0; yy < CH; yy += 8)
+          for (let xx = 0; xx < CW; xx += 8) {
+            const edge = yy < 16 || yy >= CH - 16 || xx < 16 || xx >= CW - 16;
+            const v = r() * 20;
+            ctx.fillStyle = edge
+              ? ((xx + yy) / 8) % 3 === 0
+                ? "rgb(" + ((150 + v) | 0) + "," + ((60 + v) | 0) + ",40)"
+                : "rgb(" +
+                  ((40 + v) | 0) +
+                  "," +
+                  ((90 + v) | 0) +
+                  "," +
+                  ((70 + v) | 0) +
+                  ")"
+              : "rgb(" +
+                ((215 + v) | 0) +
+                "," +
+                ((205 + v) | 0) +
+                "," +
+                ((180 + v) | 0) +
+                ")";
+            ctx.fillRect(x + xx, y + yy, 7, 7);
+          }
+        ctx.fillStyle = "#2a2622";
+        ctx.font = "bold 58px Georgia, serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(txt, x + CW / 2, y + CH / 2 + 3, CW - 60);
+      } else if (i === 4) {
+        ctx.fillStyle = "#1e6a3a";
+        ctx.fillRect(x, y, CW, CH);
+        ctx.fillStyle = "#f0f0d8";
+        ctx.font = "bold 80px Georgia, serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SUBWAY", x + CW / 2, y + CH / 2 + 4, CW - 40);
+      } else {
+        const warn = /KEEP OUT|SHELTER/.test(txt);
+        ctx.fillStyle = warn ? "#d8b020" : "#151515";
+        ctx.fillRect(x, y, CW, CH);
+        ctx.fillStyle = warn ? "#151515" : "#f2f2ea";
+        ctx.font = "bold 44px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(txt, x + CW / 2, y + CH / 2 + 2, CW - 40);
+      }
+      for (let k = 0; k < 40; k++) {
+        ctx.fillStyle = "rgba(30,25,20," + r() * 0.3 + ")";
+        ctx.fillRect(x + r() * CW, y + r() * CH, 2 + r() * 10, 1 + r() * 5);
+      }
+    });
+    const t = M.finishTex(new THREE.CanvasTexture(cv));
+    t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+    return { texture: t, roughness: 0.5 };
+  });
+  function ssign(text, x, y, z, nx, nz, w, layer, cx, cz) {
+    const i = Math.max(0, SSIGNS.indexOf(text)),
+      uv = M.cellUV(i, 2, 8);
+    const rx = nz,
+      rz = -nx,
+      h = w / 4;
+    const bb = M.buf("my/subwaysigns", cx || 0, cz || 0, layer || LAYER);
+    M.quad(
+      bb,
+      [x - (rx * w) / 2 + nx * 0.02, y - h / 2, z - (rz * w) / 2 + nz * 0.02],
+      [x + (rx * w) / 2 + nx * 0.02, y - h / 2, z + (rz * w) / 2 + nz * 0.02],
+      [x + (rx * w) / 2 + nx * 0.02, y + h / 2, z + (rz * w) / 2 + nz * 0.02],
+      [x - (rx * w) / 2 + nx * 0.02, y + h / 2, z - (rz * w) / 2 + nz * 0.02],
+      [nx, 0, nz],
+      [uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]],
+    );
+  }
+  M.subwaySign = ssign;
+
+  // -------------------------------------------------------------------
+  // Street entrance
+  // -------------------------------------------------------------------
+  function buildEntrance(e) {
+    const x1 = e.cx + e.len / 2,
+      x0 = e.cx - e.len / 2,
+      z0 = e.cz - e.w / 2,
+      z1 = e.cz + e.w / 2;
+    const cx = e.cx,
+      cz = e.cz;
+    const top = M.rasterAt(x1 + 1, cz) === M.RC.RAISED ? 0.12 : 0.0;
+    const tile = M.buf("my/subwaytile", cx, cz, "main");
+    const s = 2;
+    // stairwell walls (N, S, W) from street level down into darkness
+    const wallC0 = [0.25, 0.25, 0.23],
+      wallC1 = [0.85, 0.83, 0.78];
+    M.quad(
+      tile,
+      [x1, DEPTH2, z0],
+      [x0, DEPTH2, z0],
+      [x0, top, z0],
+      [x1, top, z0],
+      [0, 0, 1],
+      [
+        x1 / s,
+        DEPTH2 / s,
+        x0 / s,
+        DEPTH2 / s,
+        x0 / s,
+        top / s,
+        x1 / s,
+        top / s,
+      ],
+      wallC0,
+      wallC1,
+    );
+    M.quad(
+      tile,
+      [x0, DEPTH2, z1],
+      [x1, DEPTH2, z1],
+      [x1, top, z1],
+      [x0, top, z1],
+      [0, 0, -1],
+      [
+        x0 / s,
+        DEPTH2 / s,
+        x1 / s,
+        DEPTH2 / s,
+        x1 / s,
+        top / s,
+        x0 / s,
+        top / s,
+      ],
+      wallC0,
+      wallC1,
+    );
+    M.quad(
+      tile,
+      [x0, DEPTH2, z0],
+      [x0, DEPTH2, z1],
+      [x0, top, z1],
+      [x0, top, z0],
+      [1, 0, 0],
+      [
+        z0 / s,
+        DEPTH2 / s,
+        z1 / s,
+        DEPTH2 / s,
+        z1 / s,
+        top / s,
+        z0 / s,
+        top / s,
+      ],
+      [0.05, 0.05, 0.05],
+      [0.4, 0.4, 0.38],
+    );
+    // east end below the top step (the riser under the street edge)
+    // steps: first flight (walkable), landing, second flight (dark, behind the gate)
+    const sb = M.buf("concrete", cx, cz, "main");
+    const n1 = 7;
+    for (let i = 0; i < n1; i++) {
+      const tA = (LANDING * i) / n1,
+        tB = (LANDING * (i + 1)) / n1;
+      const y = top + ((DEPTH1 - top) * (i + 1)) / n1;
+      M.box(sb, x1 - tB, DEPTH2, z0, x1 - tA, y, z1, {
+        s: 1.5,
+        c: [0.7, 0.68, 0.64],
+        cy: [0.8, 0.78, 0.72],
+        skip: 8 + 16 + 32,
+      });
+      // metal nosing
+      M.box(
+        M.buf("metal_panel", cx, cz, "detail"),
+        x1 - tB - 0.02,
+        y - 0.02,
+        z0 + 0.05,
+        x1 - tB + 0.06,
+        y + 0.01,
+        z1 - 0.05,
+        { s: 1, c: [0.6, 0.6, 0.55] },
+      );
+    }
+    M.box(sb, x1 - LAND_END, DEPTH2, z0, x1 - LANDING, DEPTH1, z1, {
+      s: 1.5,
+      c: [0.62, 0.6, 0.56],
+      skip: 8 + 16 + 32,
+    });
+    const n2 = 8;
+    for (let i = 0; i < n2; i++) {
+      const tA = LAND_END + ((e.len - LAND_END) * i) / n2,
+        tB = LAND_END + ((e.len - LAND_END) * (i + 1)) / n2;
+      const y = DEPTH1 + ((DEPTH2 + 0.3 - DEPTH1) * (i + 1)) / n2;
+      M.box(sb, x1 - tB, DEPTH2 - 0.2, z0, x1 - tA, y, z1, {
+        s: 1.5,
+        c: M.mulc([0.5, 0.48, 0.45], 1 - (i / n2) * 0.8),
+        skip: 8 + 16 + 32,
+      });
+    }
+    // darkness at the bottom
+    M.quad(
+      M.buf("glass_dirty", cx, cz, "main"),
+      [x0 + 0.02, DEPTH2, z1],
+      [x0 + 0.02, DEPTH2, z0],
+      [x0 + 0.02, DEPTH1 + 0.2, z0],
+      [x0 + 0.02, DEPTH1 + 0.2, z1],
+      [1, 0, 0],
+      [0, 0, 1, 0, 1, 1, 0, 1],
+      [0.01, 0.01, 0.01],
+    );
+    // rusted scissor gate at the landing
+    const gx = x1 - LAND_END + 0.1;
+    const gb = M.buf("rust", cx, cz, "detail");
+    for (let z = z0 + 0.1; z < z1; z += 0.22)
+      M.beam(gb, gx, DEPTH1, z, gx, DEPTH1 + 2.3, z + 0.12, 0.03, 0.03, {
+        c: [0.5, 0.35, 0.28],
+      });
+    for (let z = z0 + 0.1; z < z1; z += 0.22)
+      M.beam(gb, gx, DEPTH1, z + 0.12, gx, DEPTH1 + 2.3, z, 0.03, 0.03, {
+        c: [0.5, 0.35, 0.28],
+      });
+    M.beam(gb, gx, DEPTH1 + 2.35, z0, gx, DEPTH1 + 2.35, z1, 0.08, 0.08, {
+      c: [0.45, 0.32, 0.26],
+    });
+    M.box3(gx - 0.1, DEPTH1 - 0.5, z0, gx + 0.1, DEPTH1 + 3, z1, {
+      tag: "gate",
+      surface: "metal",
+    });
+    // granite coping & iron railings (N, S, W) with colliders; the east end is the way in
+    const cp = M.buf("granite", cx, cz, "main");
+    M.box(cp, x0 - 0.3, top - 0.05, z0 - 0.3, x1, top + 0.18, z0, {
+      s: 1.5,
+      c: [0.8, 0.78, 0.74],
+    });
+    M.box(cp, x0 - 0.3, top - 0.05, z1, x1, top + 0.18, z1 + 0.3, {
+      s: 1.5,
+      c: [0.8, 0.78, 0.74],
+    });
+    M.box(cp, x0 - 0.3, top - 0.05, z0, x0, top + 0.18, z1, {
+      s: 1.5,
+      c: [0.8, 0.78, 0.74],
+    });
+    const rb = M.buf("metal_painted", cx, cz, "detail");
+    const rc = [0.2, 0.28, 0.22];
+    const rail = (ax, az, bx, bz) => {
+      M.beam(rb, ax, top + 1.1, az, bx, top + 1.1, bz, 0.06, 0.06, { c: rc });
+      M.beam(rb, ax, top + 0.35, az, bx, top + 0.35, bz, 0.04, 0.04, { c: rc });
+      const L2 = Math.hypot(bx - ax, bz - az),
+        n = Math.max(2, Math.round(L2 / 0.14));
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const px = ax + (bx - ax) * t,
+          pz = az + (bz - az) * t;
+        M.box(
+          rb,
+          px - 0.015,
+          top + 0.18,
+          pz - 0.015,
+          px + 0.015,
+          top + 1.1,
+          pz + 0.015,
+          { s: 1, c: rc, skip: 12 },
+        );
+      }
+      M.box3(
+        Math.min(ax, bx) - 0.08,
+        top,
+        Math.min(az, bz) - 0.08,
+        Math.max(ax, bx) + 0.08,
+        top + 1.15,
+        Math.max(az, bz) + 0.08,
+        { tag: "railing", surface: "metal" },
+      );
+    };
+    rail(x0 - 0.15, z0 - 0.15, x1, z0 - 0.15);
+    rail(x0 - 0.15, z1 + 0.15, x1, z1 + 0.15);
+    rail(x0 - 0.15, z0 - 0.15, x0 - 0.15, z1 + 0.15);
+    // ornate newel posts with green globe lamps at the entrance
+    for (const zz of [z0 - 0.15, z1 + 0.15]) {
+      M.cyl(rb, x1, top, zz, 0.12, 0.09, 2.3, 8, { c: rc });
+      M.cyl(rb, x1, top + 2.3, zz, 0.1, 0.16, 0.18, 8, { c: rc });
+      M.cyl(
+        M.buf("neon_green@lampg", cx, cz, "main"),
+        x1,
+        top + 2.48,
+        zz,
+        0.2,
+        0.2,
+        0.36,
+        10,
+        { capTop: true },
+      );
+      M.cyl(rb, x1, top + 2.84, zz, 0.12, 0.03, 0.14, 8, { c: rc });
+    }
+    // SUBWAY sign on a bar between the posts
+    M.beam(
+      rb,
+      x1,
+      top + 1.95,
+      z0 - 0.15,
+      x1,
+      top + 1.95,
+      z1 + 0.15,
+      0.05,
+      0.05,
+      { c: rc },
+    );
+    const i = SSIGNS.indexOf("SUBWAY"),
+      uv = M.cellUV(i, 2, 8);
+    const sg = M.buf("my/subwaysigns", cx, cz, "main");
+    M.quad(
+      sg,
+      [x1 + 0.03, top + 1.55, z1 - 0.1],
+      [x1 + 0.03, top + 1.55, z0 + 0.1],
+      [x1 + 0.03, top + 1.93, z0 + 0.1],
+      [x1 + 0.03, top + 1.93, z1 - 0.1],
+      [1, 0, 0],
+      [uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]],
+    );
+    M.quad(
+      sg,
+      [x1 - 0.03, top + 1.55, z0 + 0.1],
+      [x1 - 0.03, top + 1.55, z1 - 0.1],
+      [x1 - 0.03, top + 1.93, z1 - 0.1],
+      [x1 - 0.03, top + 1.93, z0 + 0.1],
+      [-1, 0, 0],
+      [uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]],
+    );
+    // litter & dirt in the stairwell
+    const db = M.buf("my/markings", cx, cz, "fine");
+    M.decal(db, x1 - 4.5, DEPTH1 + 0.02, cz, 1.6, 2.2, 0.3, M.MARK.LITTER);
+    M.decal(
+      db,
+      x1 - 4.2,
+      DEPTH1 + 0.025,
+      cz + 0.3,
+      1.4,
+      1.4,
+      1.1,
+      M.MARK.PUDDLE,
+    );
+    e.door = new THREE.Vector3(gx + 0.35, DEPTH1 + 1.2, cz);
+    e.outside = new THREE.Vector3(x1 + 1.4, top, cz);
+  }
+
+  M.buildSubwayEntrances = function () {
+    for (const e of M.subwayEntrances) buildEntrance(e);
+  };
+})();

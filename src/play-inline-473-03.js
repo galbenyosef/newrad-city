@@ -1,0 +1,217 @@
+// play-inline-473 03 — desc
+// Lines 694-908 of readable/play-inline-473.pretty.js (statement-aligned).
+  A({
+    id: "showgirl_costume",
+    name: "Broadway Showgirl Costume",
+    weight: 1,
+    value: 50,
+    dr: 0,
+    attrs: { presence: 2 },
+    skills: { persuasion: 5 },
+    outfit: "dj",
+    tags: ["apparel", "clothing", "oldworld"],
+    mesh: "cloth_sequin",
+    lootWeight: 0.3,
+    desc: "Sequins, feathers and very little else, from the wardrobe room of a 42nd Street revue. Glitters in the rubble.",
+  });
+  A({
+    id: "conductor_uniform",
+    name: "Subway Conductor Uniform",
+    weight: 2,
+    value: 20,
+    dr: 3,
+    skills: { mechanics: 5 },
+    outfit: "settler",
+    tags: ["apparel", "clothing", "oldworld"],
+    mesh: "cloth_blue",
+    desc: "A navy transit authority jacket with brass buttons. Stand clear of the closing doors, please.",
+  });
+  A({
+    id: "doorman_uniform",
+    name: "Doorman's Uniform",
+    weight: 2,
+    value: 25,
+    dr: 2,
+    attrs: { presence: 1 },
+    outfit: "merchant",
+    tags: ["apparel", "clothing", "oldworld"],
+    mesh: "cloth_red",
+    desc: "Maroon wool with gold braid, from a Park Avenue apartment lobby. The building is gone; the dignity remains.",
+  });
+
+  // ---------------------------------------------------------------
+  // Hats, glasses & masks
+  // ---------------------------------------------------------------
+  A({
+    id: "fedora",
+    name: "Fedora",
+    slot: "head",
+    weight: 1,
+    value: 10,
+    attrs: { senses: 1 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_fedora",
+    desc: "A felt fedora with a pinched crown. Adds a certain hard-boiled perspective to everything you look at.",
+  });
+  A({
+    id: "newsboy_cap",
+    name: "Newsboy Cap",
+    slot: "head",
+    weight: 1,
+    value: 8,
+    attrs: { presence: 1 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_cap",
+    desc: "Extra, extra — the world ended! Read all about it!",
+  });
+  A({
+    id: "baseball_cap",
+    name: "Baseball Cap",
+    slot: "head",
+    weight: 1,
+    value: 6,
+    skills: { firearms: 2 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_cap",
+    desc: "A faded cap from a Bronx ball club. They were having a good season.",
+  });
+  A({
+    id: "cowboy_hat",
+    name: "Cowboy Hat",
+    slot: "head",
+    weight: 1,
+    value: 10,
+    attrs: { reflex: 1 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_cowboy",
+    desc: "Not a lot of cattle in Manhattan. Plenty of pack oxen, though.",
+  });
+  A({
+    id: "top_hat",
+    name: "Top Hat",
+    slot: "head",
+    weight: 1,
+    value: 20,
+    attrs: { presence: 1 },
+    skills: { persuasion: 3 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_top",
+    desc: "A silk opera hat from the Metropolitan. The kind of hat that demands to be tipped.",
+  });
+  A({
+    id: "bowler_hat",
+    name: "Bowler Hat",
+    slot: "head",
+    weight: 1,
+    value: 12,
+    attrs: { wits: 1 },
+    tags: ["apparel", "hat"],
+    mesh: "hat_bowler",
+    desc: "A rounded derby hat. Makes the wearer look like a banker, a butler or a burglar.",
+  });
+  A({
+    id: "liberty_crown",
+    name: "Foam Liberty Crown",
+    slot: "head",
+    weight: 0.5,
+    value: 5,
+    attrs: { presence: 1, senses: 1 },
+    tags: ["apparel", "hat", "souvenir"],
+    mesh: "hat_crown",
+    lootWeight: 0.3,
+    desc: "A green foam souvenir crown from a Battery Park gift stand. Seven spikes for seven seas and continents. Surprisingly uplifting.",
+  });
+  A({
+    id: "hard_hat",
+    name: "Hard Hat",
+    slot: "head",
+    weight: 1,
+    value: 10,
+    dr: 3,
+    skills: { mechanics: 2 },
+    tags: ["apparel", "helmet"],
+    mesh: "hat_hard",
+    desc: "A yellow construction helmet from the eternal repair work on the FDR Drive.",
+  });
+  A({
+    id: "motorcycle_helmet",
+    name: "Motorcycle Helmet",
+    slot: "head",
+    weight: 2,
+    value: 20,
+    dr: 4,
+    tags: ["apparel", "helmet"],
+    mesh: "helmet_moto",
+    desc: "A scuffed open-face helmet with a flame decal. Safety first, style a very close second.",
+  });
+  A({
+    id: "sunglasses",
+    name: "Sunglasses",
+    slot: "eyes",
+    weight: 0,
+    value: 5,
+    attrs: { presence: 1 },
+    tags: ["apparel", "glasses"],
+    mesh: "glasses",
+    desc: "Dark aviator shades. The sun is harsher now, and so are you.",
+  });
+  A({
+    id: "reading_glasses",
+    name: "Reading Glasses",
+    slot: "eyes",
+    weight: 0,
+    value: 5,
+    attrs: { wits: 1 },
+    tags: ["apparel", "glasses"],
+    mesh: "glasses",
+    desc: "Horn-rimmed spectacles with a small crack in the left lens. The world is sharper, if not better.",
+  });
+  A({
+    id: "shooting_glasses",
+    name: "Shooting Glasses",
+    slot: "eyes",
+    weight: 0,
+    value: 12,
+    attrs: { senses: 1 },
+    tags: ["apparel", "glasses"],
+    mesh: "glasses",
+    lootWeight: 0.5,
+    desc: "Yellow-tinted range glasses. Everything looks like a target, which is more or less accurate.",
+  });
+  A({
+    id: "gas_mask",
+    name: "Gas Mask",
+    slot: "mouth",
+    weight: 2,
+    value: 15,
+    dr: 1,
+    radResist: 10,
+    tags: ["apparel", "mask"],
+    mesh: "gas_mask",
+    desc: "A civil-defense rubber mask from a subway emergency locker. Breathing through it sounds like a leaky accordion.",
+  });
+  A({
+    id: "bandana",
+    name: "Bandana",
+    slot: "mouth",
+    weight: 0,
+    value: 3,
+    attrs: { reflex: 1 },
+    tags: ["apparel", "mask"],
+    mesh: "bandana",
+    desc: "A red paisley bandana. Keeps the dust out and the anonymity in.",
+  });
+  A({
+    id: "hockey_mask",
+    name: "Hockey Mask",
+    slot: "mouth",
+    weight: 1,
+    value: 10,
+    dr: 1,
+    attrs: { presence: -1 },
+    skills: { melee: 5 },
+    tags: ["apparel", "mask"],
+    mesh: "mask_hockey",
+    lootWeight: 0.4,
+    desc: "A white goalie mask from a Rangers fan who never made it to the game. Wearing it makes people very nervous around you.",
+  });

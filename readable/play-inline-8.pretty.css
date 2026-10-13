@@ -1,0 +1,105 @@
+/* src/lair/lair.css */
+/* NEW RAD CITY — lair module overlays (finale narration cards + the Sun Room clock). Text only. */
+.lair-cards {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 880;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.lair-cards.on {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.lair-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 11vh;
+  background: #000;
+  transition: transform 0.8s ease;
+}
+.lair-bar.top {
+  top: 0;
+  transform: translateY(-100%);
+}
+.lair-bar.bot {
+  bottom: 0;
+  transform: translateY(100%);
+}
+.lair-cards.on .lair-bar {
+  transform: none;
+}
+.lair-card {
+  position: absolute;
+  left: 50%;
+  bottom: 13vh;
+  transform: translateX(-50%);
+  width: min(980px, 86vw);
+  text-align: center;
+  font:
+    italic 22px/1.55 Georgia,
+    "Times New Roman",
+    serif;
+  color: #f0e2c4;
+  text-shadow:
+    0 0 14px rgba(0, 0, 0, 0.95),
+    0 2px 3px #000;
+}
+.lair-who {
+  font:
+    600 13px/1 "Share Tech Mono",
+    "Courier New",
+    monospace;
+  letter-spacing: 0.35em;
+  color: #ffcf7a;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-style: normal;
+}
+.lair-text {
+  min-height: 2.2em;
+  white-space: pre-line;
+}
+.lair-hint {
+  margin-top: 12px;
+  font:
+    11px/1 "Share Tech Mono",
+    "Courier New",
+    monospace;
+  letter-spacing: 0.3em;
+  color: rgba(240, 226, 196, 0.45);
+  font-style: normal;
+}
+.lair-clock {
+  position: fixed;
+  left: 50%;
+  top: 14px;
+  transform: translateX(-50%);
+  z-index: 860;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  font:
+    600 13px/1 "Share Tech Mono",
+    "Courier New",
+    monospace;
+  letter-spacing: 0.3em;
+  color: #ffcf7a;
+  text-shadow: 0 0 10px rgba(255, 160, 60, 0.6);
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 190, 110, 0.35);
+  background: rgba(20, 10, 4, 0.45);
+}
+.lair-clock.on {
+  opacity: 1;
+}
+.lair-clock-l {
+  opacity: 0.6;
+  margin-right: 12px;
+}
+.lair-clock-t {
+  font-size: 18px;
+}

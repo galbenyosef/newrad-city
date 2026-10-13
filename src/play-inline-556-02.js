@@ -1,0 +1,340 @@
+// play-inline-556 02 — the
+// Lines 267-604 of readable/play-inline-556.pretty.js (statement-aligned).
+  const STOCK = {
+    guns: [
+      ["pistol_10mm", 2],
+      ["pistol_32", 1],
+      ["magnum_44", 1],
+      ["smg_10mm", 1],
+      ["hunting_rifle", 1],
+      ["combat_shotgun", 1],
+      ["sawed_off_shotgun", 1],
+      ["assault_rifle", 1],
+      ["gyrojet_pistol", 1],
+      ["combat_knife", 2],
+      ["switchblade", 1],
+      ["baseball_bat", 1],
+      ["lead_pipe", 1],
+      ["brass_knuckles", 1],
+      ["frag_grenade", 4],
+      ["ammo_10mm", 40],
+    ],
+    ammo: [
+      ["ammo_10mm", 180],
+      ["ammo_32", 120],
+      ["ammo_308", 40],
+      ["ammo_556", 120],
+      ["ammo_5mm", 200],
+      ["ammo_44", 36],
+      ["ammo_12ga", 60],
+      ["ammo_gyrojet", 60],
+      ["ammo_recoilless", 1],
+      ["ammo_flamer_fuel", 40],
+      ["frag_grenade", 3],
+      ["frag_mine", 2],
+      ["ammo_missile", 2],
+    ],
+    armor: [
+      ["leather_armor", 1],
+      ["leather_armor_reinforced", 1],
+      ["metal_armor", 1],
+      ["metal_helmet", 1],
+      ["combat_armor", 1],
+      ["combat_helmet", 1],
+      ["biker_leathers", 1],
+      ["hired_gun_fatigues", 1],
+      ["hired_gun_vest", 1],
+      ["old_world_formalwear", 1],
+      ["old_world_spring_dress", 1],
+      ["showgirl_costume", 1],
+      ["fedora", 1],
+      ["top_hat", 1],
+      ["bowler_hat", 1],
+      ["newsboy_cap", 1],
+      ["sunglasses", 1],
+      ["gas_mask", 1],
+      ["radiation_suit", 1],
+      ["survivor_layers", 2],
+    ],
+    junk: [
+      ["scrap_metal", 10],
+      ["scrap_electronics", 5],
+      ["duct_tape", 5],
+      ["tuff_bond", 3],
+      ["conductor", 3],
+      ["vacuum_tube", 4],
+      ["dry_cell", 3],
+      ["relay_board", 2],
+      ["surgical_tubing", 2],
+      ["gas_igniter", 2],
+      ["turpentine", 2],
+      ["homeguard_cleanser", 3],
+      ["lighter", 2],
+      ["tin_can", 6],
+      ["toy_car", 1],
+      ["teddy_bear", 1],
+      ["lunchbox", 1],
+    ],
+    noodles: [
+      ["chow_mein_cup", 8],
+      ["mama_marinara_meatballs", 3],
+      ["frank_in_a_bun", 4],
+      ["salisbury_steak", 3],
+      ["golden_plain_jerky", 5],
+      ["franks_and_beans", 4],
+      ["egg_cream", 2],
+      ["bodega_pretzel", 4],
+      ["coney_dog", 3],
+      ["shellback_chowder", 2],
+      ["purified_water", 4],
+      ["fizzo_cola", 5],
+      ["prairie_root_beer", 3],
+      ["beer", 4],
+    ],
+    grill: [
+      ["ox_steak", 5],
+      ["ox_meat", 4],
+      ["pigeon_on_a_stick", 6],
+      ["tunnel_rat_skewer", 4],
+      ["burrow_rat_meat", 3],
+      ["shellback_cakes", 3],
+      ["roach_meat", 6],
+      ["ox_milk", 3],
+      ["gnarlberry", 4],
+      ["dirty_water", 5],
+    ],
+    chems: [
+      ["rush", 4],
+      ["rage", 3],
+      ["bull_tabs", 3],
+      ["focus_pills", 3],
+      ["morphine_syrette", 3],
+      ["iodine_tabs", 4],
+      ["prussian_blue", 3],
+      ["sunny_pills", 3],
+      ["redline", 2],
+      ["overdrive", 1],
+      ["clean_slate", 2],
+      ["shade_field", 1],
+    ],
+    water: [
+      ["purified_water", 10],
+      ["dirty_water", 6],
+      ["fizzo_cola", 8],
+      ["fizzo_lime", 3],
+      ["fizzo_cola_chilled", 2],
+      ["prairie_root_beer", 5],
+      ["beer", 8],
+      ["whiskey", 3],
+      ["vodka", 3],
+      ["wine", 2],
+      ["scotch", 2],
+    ],
+    robo: [
+      ["scrap_electronics", 8],
+      ["relay_board", 4],
+      ["dry_cell", 5],
+      ["vacuum_tube", 6],
+      ["conductor", 5],
+      ["gas_igniter", 2],
+      ["ammo_dry_cell", 20],
+      ["ammo_gyrojet", 50],
+      ["ammo_rivet", 40],
+      ["gyrojet_pistol", 1],
+      ["gyrojet_carbine", 1],
+      ["riot_gas_grenade", 2],
+    ],
+    pawn: [
+      ["gold_bar", 1],
+      ["old_dollars", 8],
+      ["souvenir_paperweight", 1],
+      ["souvenir_statue", 2],
+      ["stock_certificate", 3],
+      ["typewriter", 1],
+      ["microscope", 1],
+      ["pool_ball", 3],
+      ["baseball", 1],
+      ["broken_camera", 1],
+      ["cigarette_carton", 2],
+      ["old_world_book", 3],
+      ["subway_token", 6],
+      ["ashtray", 1],
+      ["sunglasses", 1],
+      ["old_world_businesswear", 1],
+    ],
+    annie: [
+      ["hunting_rifle", 1],
+      ["sniper_rifle", 1],
+      ["magnum_44", 1],
+      ["pistol_10mm", 1],
+      ["ammo_308", 60],
+      ["ammo_44", 48],
+      ["ammo_10mm", 100],
+      ["ammo_bb", 200],
+      ["bb_gun", 1],
+      ["shooting_glasses", 1],
+    ],
+    doc: [
+      ["rally_tonic", 8],
+      ["rally_tonic_extra", 2],
+      ["prussian_blue", 6],
+      ["iodine_tabs", 5],
+      ["morphine_syrette", 3],
+      ["field_surgery_kit", 2],
+      ["blood_pack", 4],
+      ["clean_slate", 1],
+      ["root_poultice", 2],
+    ],
+  };
+
+  // ------------------------------------------------------------------
+  // Routines (night-owl hours: the Neon wakes at dusk). [fromHour, activity]
+  // ------------------------------------------------------------------
+  const ROUTINES = {
+    stall_day: [
+      [7, "work"],
+      [23.5, "drink"],
+      [1.5, "sleep"],
+    ],
+    stall_late: [
+      [10, "work"],
+      [2, "drink"],
+      [4, "sleep"],
+    ],
+    stall_night: [
+      [16, "work"],
+      [8, "sleep"],
+    ],
+    shop_keep: [
+      [8, "work"],
+      [22, "drink"],
+      [0.5, "sleep"],
+    ],
+    hawker: [
+      [9, "work"],
+      [22.5, "party"],
+      [1, "sleep"],
+    ],
+    reveler: [
+      [15, "shop"],
+      [18.5, "eat"],
+      [20, "show"],
+      [23, "party"],
+      [2.5, "drink"],
+      [5, "bench"],
+      [9, "sleep"],
+    ],
+    drunk: [
+      [18, "drink"],
+      [5, "bench"],
+      [11, "sleep"],
+    ],
+    porter: [
+      [6, "depot"],
+      [12, "eat"],
+      [13, "depot"],
+      [18, "drink"],
+      [22, "party"],
+      [0, "sleep"],
+    ],
+    shopper: [
+      [8, "shop"],
+      [12, "eat"],
+      [13, "bench"],
+      [15, "shop"],
+      [19, "show"],
+      [22.5, "drink"],
+      [0.5, "sleep"],
+    ],
+    singer: [
+      [12, "shop"],
+      [19.5, "perform"],
+      [23.5, "drink"],
+      [3, "sleep"],
+    ],
+    director: [
+      [13, "work"],
+      [3, "drink"],
+      [5, "sleep"],
+    ],
+    // 47b residents (club / speakeasy regulars, night watch, venue staff, buskers)
+    // (club / speakeasy people live indoors: they only cross the square between the Bunkhouse and their venue,
+    //  so the street crowd — the busiest view in the game — doesn't grow with them)
+    clubber: [
+      [20.5, "work"],
+      [4.5, "sleep"],
+    ],
+    barfly: [
+      [17, "work"],
+      [3.5, "sleep"],
+    ],
+    nightwatch: [
+      [19, "work"],
+      [7, "barracks"],
+    ],
+    venue: [
+      [18, "work"],
+      [5, "sleep"],
+    ],
+    busker: [
+      [16, "perform"],
+      [1.5, "drink"],
+      [4, "sleep"],
+    ],
+  };
+  function activityAt(routine, h) {
+    const r = ROUTINES[routine];
+    if (!r) return "work";
+    // entries are in daily order starting at r[0][0]; find the last entry whose start <= h (wrapping)
+    let best = r[r.length - 1][1],
+      bestD = 99;
+    for (const [from, act] of r) {
+      const d = (h - from + 24) % 24;
+      if (d < bestD) {
+        bestD = d;
+        best = act;
+      }
+    }
+    return best;
+  }
+
+  // ------------------------------------------------------------------
+  // Barks (all original)
+  // ------------------------------------------------------------------
+  const GUARD_DAY = {
+    greet: [
+      "Welcome to the Neon. Keep it friendly.",
+      "Rules are simple: no shooting, no stealing, no eating the residents.",
+      "Captain's at the north gate if you need her.",
+      "Topsider, huh? Relax. We only bite paying customers.",
+      "You're fine. You got a face like a person. Mostly.",
+    ],
+    idle: [
+      "Eyes on the avenues.",
+      "Quiet day. I hate quiet days.",
+      "If it runs like a Maniac and howls like a Maniac…",
+      "Shift ends at sundown. Sundown ends never.",
+      "Anybody seen my other glove? It had a finger in it.",
+      "Keep that lane clear, folks!",
+    ],
+    alert: ["Contact!", "Hostile at the gate!", "Light it up!"],
+  };
+  const GUARD_NIGHT = {
+    greet: [
+      "Evening. Lights are on, so behave.",
+      "Night market's open. So are my eyes.",
+      "Stay in the light, stranger.",
+    ],
+    idle: [
+      "Neon's bright tonight. Makes the dark look darker.",
+      "Something moved on Forty-Second. …Rat. Big rat.",
+      "Night shift. Best shift. Nobody smells you coming.",
+      "Hear that? That's the Opry. Poor bastards.",
+      "Keep your eyes off the billboards, they'll burn your eyes out. What's left of 'em.",
+    ],
+    alert: [
+      "Contact in the dark!",
+      "Movement at the gate!",
+      "Hit the spotlight!",
+    ],
+  };

@@ -1,0 +1,323 @@
+// play-inline-240 03 — color
+// Lines 371-691 of readable/play-inline-240.pretty.js (statement-aligned).
+  PR.glowQ = [];
+  PR.glow = function (pos, color, size, parent, opts) {
+    const rec = {
+      pos: pos.clone ? pos.clone() : V3(pos.x, pos.y, pos.z),
+      color,
+      size,
+      parent: parent || null,
+      opts: opts || {},
+    };
+    if (!PR.makeGlow(rec)) PR.glowQ.push(rec);
+    return rec;
+  };
+  PR.makeGlow = function (rec) {
+    if (!PR.live("fx") || typeof G.fx.glowSprite !== "function") return false;
+    return !!PR.safe("glow", () => {
+      const o = Object.assign({}, rec.opts);
+      if (rec.parent) o.parent = rec.parent;
+      const s = G.fx.glowSprite(rec.pos, rec.color, rec.size, o);
+      if (s && s.isObject3D && !s.parent) (rec.parent || G.scene).add(s);
+      rec.sprite = s;
+      return true;
+    });
+  };
+
+  // -------------------------------------------------------------------
+  // Static world pickups (notes, tape reels, uniques) — spawned at initDone
+  // -------------------------------------------------------------------
+  PR.pickupQ = [];
+  PR.pickup = function (id, n, pos, opts) {
+    PR.pickupQ.push({
+      id,
+      n: n || 1,
+      pos: pos.clone ? pos.clone() : V3(pos.x, pos.y, pos.z),
+      opts: opts || {},
+    });
+  };
+  PR.spawnPickups = function () {
+    if (!PR.live("items") || typeof G.items.spawnPickup !== "function") return;
+    for (const p of PR.pickupQ)
+      PR.safe("pickup:" + p.id, () =>
+        G.items.spawnPickup(
+          p.id,
+          p.n,
+          p.pos,
+          Object.assign({ static: true }, p.opts),
+        ),
+      );
+  };
+
+  // -------------------------------------------------------------------
+  // Persistent props (containers, terminals, lamps...) — spawned at initDone
+  // -------------------------------------------------------------------
+  PR.propQ = [];
+  PR.prop = function (type, opts) {
+    PR.propQ.push({ type, opts });
+  };
+  PR.spawnProps = function () {
+    for (const p of PR.propQ) PR.spawnProp(p.type, p.opts);
+  };
+
+  // -------------------------------------------------------------------
+  // Custom interactables with a label that can change (switches, nests...)
+  // -------------------------------------------------------------------
+  PR.use = function (def) {
+    return PR.safe("interactable", () =>
+      G.world.addInteractable(
+        Object.assign({ radius: 0.8, range: 2.8, priority: 1 }, def),
+      ),
+    );
+  };
+  /** Interior load door with stable id. */
+  PR.door = function (def) {
+    return PR.safe("door", () =>
+      G.world.addDoor(Object.assign({ radius: 1.3 }, def)),
+    );
+  };
+
+  // -------------------------------------------------------------------
+  // Custom materials for this module (added to the lib's table)
+  // -------------------------------------------------------------------
+  const MD = PR.MAT_DEFS;
+  Object.assign(MD, {
+    brownstone_t: {
+      src: "stone_brownstone",
+      custom: "sandstone",
+      color: 0x9e7a6a,
+      tint: 0xf0c8b4,
+      rough: 0.95,
+      uv: 3,
+    },
+    brownstone_dk: {
+      src: "stone_brownstone",
+      custom: "sandstone",
+      color: 0x6a4c40,
+      tint: 0xb89080,
+      rough: 0.95,
+      uv: 3,
+    },
+    cobble: { src: "cobblestone", color: 0x6a645a, rough: 0.95, uv: 3 },
+    brick_tan: { src: "brick_tan", color: 0xa0805a, rough: 0.95, uv: 3 },
+    brick_white: { src: "brick_white", color: 0xc8c0b0, rough: 0.95, uv: 3 },
+    brick_fed: {
+      src: "brick_red",
+      color: 0x8a4a34,
+      tint: 0xd09070,
+      rough: 0.95,
+      uv: 2.6,
+    },
+    slate: {
+      src: "granite",
+      color: 0x3c3e40,
+      tint: 0x55585c,
+      rough: 0.85,
+      uv: 2,
+    },
+    fed_stone: {
+      custom: "buffstone",
+      prefer: "custom",
+      color: 0xb8a282,
+      tint: 0xd8ccb0,
+      rough: 0.9,
+      uv: 3.5,
+      bump: 0.8,
+    },
+    fed_rust: {
+      custom: "granite_ashlar",
+      prefer: "custom",
+      color: 0x9a8c74,
+      tint: 0xc0b090,
+      rough: 0.92,
+      uv: 2.4,
+      bump: 1.0,
+    },
+    vault_steel: {
+      src: "metal_scratched",
+      color: 0x8a8e90,
+      tint: 0xb8bcbe,
+      rough: 0.35,
+      metal: 0.8,
+      uv: 3,
+    },
+    vault_dark: {
+      src: "metal_panel",
+      color: 0x3a3e40,
+      tint: 0x5a5e62,
+      rough: 0.5,
+      metal: 0.6,
+      uv: 3,
+    },
+    goldbar: {
+      color: 0xd4a23a,
+      emissive: 0x5a3a08,
+      emissiveIntensity: 0.5,
+      rough: 0.28,
+      metal: 0.75,
+      uv: 1,
+      plain: true,
+    },
+    brass: { color: 0x9a7a3a, rough: 0.35, metal: 0.8, uv: 2, plain: true },
+    white_paint: {
+      src: "metal_painted",
+      color: 0xc8c4b8,
+      tint: 0xe8e4d8,
+      rough: 0.7,
+      metal: 0.1,
+      uv: 3,
+    },
+    hull_black: {
+      src: "metal_painted",
+      color: 0x1c1c1e,
+      tint: 0x2c2c2e,
+      rough: 0.6,
+      metal: 0.4,
+      uv: 3,
+    },
+    hull_red: {
+      src: "metal_painted",
+      color: 0x7a2018,
+      tint: 0x9a3020,
+      rough: 0.65,
+      metal: 0.35,
+      uv: 3,
+    },
+    hull_white: {
+      src: "metal_painted",
+      color: 0xd0ccc0,
+      tint: 0xece8dc,
+      rough: 0.65,
+      metal: 0.2,
+      uv: 3,
+    },
+    deck_wood: {
+      src: "wood_planks",
+      color: 0x7a6a50,
+      tint: 0xa89a80,
+      rough: 0.9,
+      uv: 2,
+    },
+    mahogany: {
+      src: "wood_planks",
+      color: 0x4a2a1a,
+      tint: 0x7a4a34,
+      rough: 0.6,
+      uv: 2,
+    },
+    oak: {
+      src: "wood_planks",
+      color: 0x6a4e30,
+      tint: 0x9a7a54,
+      rough: 0.7,
+      uv: 2,
+    },
+    plaster_w: {
+      src: "plaster_stained",
+      color: 0xb8b0a0,
+      tint: 0xe0d8c8,
+      rough: 0.95,
+      uv: 4,
+    },
+    wallpaper_g: {
+      src: "wallpaper",
+      color: 0x5a6a50,
+      tint: 0x8a9a78,
+      rough: 0.95,
+      uv: 2.5,
+    },
+    tile_sub: { src: "tile_subway", color: 0xd8d4c8, rough: 0.5, uv: 2 },
+    tar: { src: "roof_tar", color: 0x2a2a28, rough: 0.95, uv: 5 },
+    copper: {
+      src: "copper_patina",
+      color: 0x5f9884,
+      rough: 0.8,
+      metal: 0.2,
+      uv: 4,
+      custom: "verdigris",
+      tint: 0xb8d8cc,
+    },
+    rope: { src: "burlap", color: 0x8a7a58, tint: 0xb0a080, rough: 1, uv: 0.5 },
+    moss: {
+      src: "grass_dead",
+      color: 0x4a5a30,
+      tint: 0x6a7a44,
+      rough: 1,
+      uv: 3,
+    },
+    egg: {
+      color: 0xc8c49a,
+      emissive: 0x6a8a20,
+      emissiveIntensity: 0.35,
+      rough: 0.35,
+      uv: 1,
+      plain: true,
+    },
+    slime: {
+      color: 0x3a4a1a,
+      emissive: 0x2a4a08,
+      emissiveIntensity: 0.4,
+      rough: 0.2,
+      metal: 0.1,
+      uv: 2,
+      plain: true,
+    },
+    laser: {
+      color: 0xff3020,
+      emissive: 0xff1808,
+      emissiveIntensity: 3.0,
+      rough: 1,
+      uv: 1,
+      plain: true,
+      noShadow: true,
+    },
+    candle: { color: 0xf0e8d0, rough: 0.8, uv: 1, plain: true },
+    flame: {
+      color: 0xffc060,
+      emissive: 0xffa030,
+      emissiveIntensity: 3.0,
+      rough: 1,
+      uv: 1,
+      plain: true,
+      noShadow: true,
+    },
+    lamp_warm: {
+      color: 0xffe0a0,
+      emissive: 0xffc070,
+      emissiveIntensity: 2.0,
+      rough: 0.5,
+      uv: 1,
+      plain: true,
+      noShadow: true,
+    },
+    lamp_blue: {
+      color: 0x90c0ff,
+      emissive: 0x4080ff,
+      emissiveIntensity: 1.8,
+      rough: 0.5,
+      uv: 1,
+      plain: true,
+      noShadow: true,
+    },
+    velvet: {
+      src: "fabric",
+      color: 0x5a1a1c,
+      tint: 0x8a2a2a,
+      rough: 1,
+      uv: 1.5,
+    },
+    linen: {
+      src: "fabric",
+      color: 0xb8b0a0,
+      tint: 0xe8e0d0,
+      rough: 1,
+      uv: 1.5,
+    },
+    net: { src: "chainlink", color: 0x6a6450, tint: 0x9a9070, rough: 1, uv: 1 },
+  });
+
+  // -------------------------------------------------------------------
+  // Stained glass & custom textures
+  // -------------------------------------------------------------------
+  const TAU = Math.PI * 2;
+  /** Leaded stained-glass lancet (uv 0..1). variant picks the palette / motif. */
