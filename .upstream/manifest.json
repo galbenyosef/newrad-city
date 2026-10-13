@@ -1,0 +1,14 @@
+{
+  "generated": "2026-10-13T00:35:42.403Z",
+  "origin": "https://newrad.city",
+  "files": {
+    ".netlify/scripts/rum": {
+      "bytes": 11141,
+      "sha256": "257ef1b7dd06f88a465e5badb58c57b62cf678d7618ecc2929aa3b428e848122"
+    },
+    "play.html": {
+      "bytes": 22667976,
+      "sha256": "6474efc12a5d48ac94c46342170a738c1417d139b984e9fc9e6080a8ff8a4ef5"
+    }
+  }
+}

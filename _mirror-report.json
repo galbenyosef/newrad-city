@@ -1,0 +1,42 @@
+{
+  "start": "https://newrad.city/play",
+  "origin": "https://newrad.city",
+  "gated": false,
+  "sessionRenewal": "none",
+  "requests": 5,
+  "fetched": 2,
+  "bytes": 22679117,
+  "paths": [
+    ".netlify/scripts/rum",
+    "play.html"
+  ],
+  "routeAliases": [
+    {
+      "route": "/play",
+      "disk": "play.html",
+      "status": 200,
+      "aliasSame": true
+    },
+    {
+      "route": "/play/",
+      "status": 301,
+      "location": "/play"
+    }
+  ],
+  "unresolved": [
+    {
+      "status": 404,
+      "path": "favicon.ico",
+      "probes": 1
+    }
+  ],
+  "unreachable": [],
+  "external": [
+    "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap",
+    "https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&family=VT323&family=Oswald:wght@400;600;700&family=Special+Elite&display=swap",
+    "https://www.instagram.com/chrisfirstt/",
+    "https://x.com/chrisfirst"
+  ]
+}
