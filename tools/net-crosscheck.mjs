@@ -28,15 +28,19 @@
 //        node tools/net-crosscheck.mjs docs/boot-network-<date>.json
 import fs from "node:fs";
 
-const log = JSON.parse(
-  "[" +
-    fs
-      .readFileSync(process.argv[2], "utf8")
-      .split("\n")
-      .filter((l) => l.trim().startsWith("{"))
-      .join(",") +
-    "]",
-);
+// JSON-lines log; tolerate a truncated tail (the --follow logger can be killed
+// mid-line and appends an error envelope line when the session detaches)
+const log = [];
+for (const line of fs.readFileSync(process.argv[2], "utf8").split("\n")) {
+  const t = line.trim();
+  if (!t.startsWith("{")) continue;
+  try {
+    const o = JSON.parse(t);
+    if (o && o.url) log.push(o);
+  } catch {
+    /* truncated tail: skip */
+  }
+}
 const manifest = JSON.parse(fs.readFileSync(new URL("../.upstream/manifest.json", import.meta.url), "utf8"));
 const have = new Set(Object.keys(manifest.files));
 // recorded 404 gaps (from the capture crawl): a request for one of these is

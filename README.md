@@ -55,14 +55,15 @@ Netlify RUM beacon (`.netlify/scripts/rum`, 11,141 B). The build stamp is
 
 The runtime closure was scanned statically (`tools/capture.mjs --check` →
 1 reference group, 0 unresolved) and cross-checked against an opencli browser
-network log recorded on loopback with the logger attached before navigation —
-covering the document load and the running game's build phase
-(`docs/boot-network-2026-10-13.json`, 11 requests): **0 new same-origin
-requests beyond the capture** — `/play` and `/.netlify/scripts/rum` (11,141 B,
-exact) are the only same-origin requests. Off-origin: the two Google Fonts
-stylesheets + five `fonts.gstatic.com` font files + the jsdelivr three.js —
-all recorded external. One in-page `blob:` URL (a worker built from a Blob in
-the game code). The only recorded 404 is the browser-implicit `favicon.ico`.
+network log recorded on loopback with the logger attached before navigation and
+left running through the whole session — document load, city build, NEW GAME,
+the intro and first-person play (`docs/boot-network-2026-10-13.json`, 11
+requests): **0 new same-origin requests beyond the capture** — `/play` and
+`/.netlify/scripts/rum` (11,141 B, exact) are the only same-origin requests.
+Off-origin: the two Google Fonts stylesheets + five `fonts.gstatic.com` font
+files + the jsdelivr three.js — all recorded external. One in-page `blob:` URL
+(a worker built from a Blob in the game code). The only recorded 404 is the
+browser-implicit `favicon.ico`.
 
 ## Layout
 
@@ -177,16 +178,16 @@ tree (`node tools/capture.mjs`), re-cutting the manifest, and re-deriving
   all (procedural art/audio), so the capture is complete.
 - **Dynamic closure cross-check** — the mirror was served on loopback
   (`tools/serve.mjs`) and opened in an opencli browser session with
-  `network --all --follow` attached before navigation, covering the document
-  load and the running game's build phase; the recorded log
-  (`docs/boot-network-2026-10-13.json`, 11 entries) contains **zero same-origin
-  requests that are not captured files**: `/play` (200) and
-  `/.netlify/scripts/rum` (200, 11,141 B — the captured size). Off-origin:
-  `fonts.googleapis.com` ×2, `fonts.gstatic.com` ×5 (font files),
+  `network --all --follow` attached before navigation and left running across
+  the whole session (document load → title → NEW GAME → intro → first-person
+  play); the recorded log (`docs/boot-network-2026-10-13.json`, 11 entries)
+  contains **zero same-origin requests that are not captured files**: `/play`
+  (200) and `/.netlify/scripts/rum` (200, 11,141 B — the captured size).
+  Off-origin: `fonts.googleapis.com` ×2, `fonts.gstatic.com` ×5 (font files),
   `cdn.jsdelivr.net` ×1 (three.js) — all recorded external; one in-page
-  `blob:` worker URL. `tools/net-crosscheck.mjs` → `0 new missing`. During the
-  play session afterwards (NEW GAME → intro → first-person play, see the boot
-  bullet) the game made no further network requests at all.
+  `blob:` worker URL. `tools/net-crosscheck.mjs` → `0 new missing`. The play
+  session made no further network requests at all (the log stops growing once
+  the document is loaded).
 - **readable/** — pinned prettier 3.9.6 (module API, default options,
   format-to-fixed-point: 640 sources stabilize on the second pass, 3 on the
   third; the per-source `prettyPasses` count is recorded; never the CLI — it
