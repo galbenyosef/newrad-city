@@ -506,7 +506,9 @@ if (manifest) {
       [/NEW RAD CITY/, "the project banner"],
       [/cdn\.jsdelivr\.net\/npm\/three@0\.158\.0\/build\/three\.min\.js/, "the three.js CDN script"],
       [/fonts\.googleapis\.com/, "the Google Fonts stylesheet"],
-      [/id="game-canvas"/, "the game canvas"],
+      [/domElement\.id = 'game-canvas'/, "the renderer canvas id"],
+      [/new THREE\.WebGLRenderer/, "the three.js renderer construction"],
+      [/requestAnimationFrame/, "the frame loop"],
     ])
       if (!re.test(entry)) problem(`${ENTRY}: shape guard failed (${what}) — the capture changed shape`);
   }
