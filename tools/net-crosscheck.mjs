@@ -59,10 +59,17 @@ const sameOrigin = new Map(); // path -> statuses
 const offOrigin = new Map();
 const nonGet = [];
 let dataUris = 0;
+let blobUris = 0;
 for (const e of log) {
   if (!e.url) continue;
   if (e.url.startsWith("data:")) {
     dataUris++;
+    continue;
+  }
+  if (e.url.startsWith("blob:")) {
+    // in-page object URLs (worker sources built from Blob in the game code) —
+    // never network requests
+    blobUris++;
     continue;
   }
   let u;
@@ -82,7 +89,7 @@ for (const e of log) {
   }
 }
 console.log(
-  `entries: ${log.length} (off-origin: ${[...offOrigin.entries()].map(([o, n]) => `${o} x${n}`).join(", ") || "none"}; embedded data: URIs: ${dataUris})`,
+  `entries: ${log.length} (off-origin: ${[...offOrigin.entries()].map(([o, n]) => `${o} x${n}`).join(", ") || "none"}; embedded data: URIs: ${dataUris}; in-page blob: URLs: ${blobUris})`,
 );
 console.log("--- same-origin requests not in manifest:");
 let novel = 0;
