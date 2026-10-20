@@ -149,6 +149,7 @@ node tools/verify.mjs                 # re-hash the capture → 2 files checked,
 node tools/audit.js                   # derived-layer integrity gate → AUDIT PASS
 node tools/capture.mjs --check        # residual closure audit → 0 new unresolved
 node tools/net-crosscheck.mjs docs/boot-network-2026-10-13.json   # dynamic closure check
+node tools/check-exports.mjs                                      # the derived layer still exports every public name
 ```
 
 ## Updating from upstream
