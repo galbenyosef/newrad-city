@@ -90,6 +90,8 @@ browser-implicit `favicon.ico`.
 - `tools/verify.mjs` — re-hash the capture against the manifest
 - `tools/update.mjs` — read-only drift probe against the live origin
 - `tools/audit.js` — integrity gate for the derived layers (`AUDIT PASS`)
+- `tools/check-links.mjs` — link gate: every scope of the derived layer exports
+  only names the layer declares (`node tools/check-links.mjs`)
 - `tools/net-crosscheck.mjs` — compare an opencli network log against the
   manifest (dynamic closure check)
 - `tools/serve.mjs` — static server reproducing the origin's served paths
@@ -150,7 +152,19 @@ node tools/audit.js                   # derived-layer integrity gate → AUDIT P
 node tools/capture.mjs --check        # residual closure audit → 0 new unresolved
 node tools/net-crosscheck.mjs docs/boot-network-2026-10-13.json   # dynamic closure check
 node tools/check-exports.mjs                                      # the derived layer still exports every public name
+node tools/check-links.mjs                                        # every scope of the derived layer exports only names the layer declares
 ```
+
+`check-links.mjs` guards the one class the export-name gate cannot see: a
+layer file whose export statement names a binding the layer never declares is
+a hard SyntaxError at link time, and the file cannot be imported at all. The
+layer here is a CLASSIC-SCRIPT layer — 2945 slices cut from 631 readable
+modules, each the body of an IIFE — and it carries no export statement
+anywhere, so the class is structurally absent today and the gate says so
+(631 scopes, 0 export tables). It is deployed because it is this mirror's only
+watch on the export side of the layer, and it fires the moment a slice carries
+an export table that names a binding the module does not declare.
+
 
 ## Updating from upstream
 
