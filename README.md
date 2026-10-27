@@ -87,6 +87,12 @@ browser-implicit `favicon.ico`.
 - `tools/capture.mjs` — byte-exact capture + runtime-closure fetch (`--check`
   residual closure audit, `--dry-run` scanner candidates)
 - `tools/derive.mjs` — rebuild `readable/` + `src/` + `split-spec.json`
+- `tools/pinned-prettier.cjs` — the one place this mirror resolves its pinned
+  prettier 3.9.6: the vendored copy below, `$PRETTIER_MJS` as an override, a
+  local `node_modules` last; any other version is refused
+- `tools/vendor/prettier/` — prettier 3.9.6 (module API) vendored into this
+  mirror so re-derivation never reaches into another mirror's tree (19 files;
+  see `VENDOR-README.md`)
 - `tools/verify.mjs` — re-hash the capture against the manifest
 - `tools/update.mjs` — read-only drift probe against the live origin
 - `tools/audit.js` — integrity gate for the derived layers (`AUDIT PASS`)

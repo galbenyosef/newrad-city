@@ -61,13 +61,14 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { spawnSync } = require("node:child_process");
-const { pathToFileURL } = require("node:url");
+// The one place this mirror resolves the pinned prettier (vendored in
+// tools/vendor/prettier/ — see tools/vendor/prettier/VENDOR-README.md).
+const { PINNED, loadPinnedPrettier } = require("./pinned-prettier.cjs");
 
 const here = __dirname;
 const proj = path.resolve(here, "..");
 const srcDir = path.join(proj, "src");
 const readableDir = path.join(proj, "readable");
-const PINNED = "3.9.6";
 const ENTRY = "play.html";
 
 const problems = [];
@@ -578,31 +579,23 @@ if (manifest) {
   }
 }
 
-// ── best-effort: re-render every pretty with the pinned prettier 3.9.6 ─
-const prettierCandidates = [
-  process.env.PRETTIER_MJS,
-  path.join(proj, "node_modules", "prettier", "index.mjs"),
-  "D:/repos/mirrors/metropolygonia/node_modules/prettier/index.mjs",
-].filter(Boolean);
-function loadPinnedPrettier() {
-  for (const c of prettierCandidates) {
-    if (!fs.existsSync(c)) continue;
-    try {
-      const pkg = JSON.parse(fs.readFileSync(path.join(path.dirname(c), "package.json"), "utf8"));
-      if (pkg.version !== PINNED) continue;
-      return c;
-    } catch {
-      /* keep looking */
-    }
-  }
-  return null;
-}
-
+// ── re-render every pretty with the pinned prettier 3.9.6 ────────────────
+// The resolution lives in tools/pinned-prettier.cjs (the vendored copy in
+// tools/vendor/prettier/ first). The re-render check is NOT best-effort any
+// more: the pinned prettier is committed in this mirror, so a mirror that
+// cannot find it is a mirror whose committed layer cannot be re-verified —
+// that is a FAILURE, reported with the same message the derive gives, not a
+// silent skip.
 (async () => {
-  let renderNote = `prettier ${PINNED} not importable — renderOptions recorded, re-render check skipped`;
-  const prettierPath = loadPinnedPrettier();
-  if (prettierPath) {
-    const prettier = (await import(pathToFileURL(prettierPath).href)).default;
+  let renderNote = "";
+  let prettier = null;
+  try {
+    ({ mod: prettier } = await loadPinnedPrettier(proj));
+  } catch (e) {
+    problem(`the pinned prettier ${PINNED} cannot be resolved, so the committed layer cannot be re-rendered:\n${e.message}`);
+    renderNote = `prettier ${PINNED} NOT resolvable — re-render check FAILED`;
+  }
+  if (prettier) {
     // format-to-fixed-point: derive records the stable output (most blocks are
     // stable after one pass; a few member-chain reflows need more — the per-source
     // prettyPasses count is in split-spec.json). The loop below mirrors derive's.

@@ -44,7 +44,12 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+// The one place this mirror resolves the pinned prettier (vendored in
+// tools/vendor/prettier/ — see tools/vendor/prettier/VENDOR-README.md).
+import pinnedPrettier from "./pinned-prettier.cjs";
+
+const { PINNED, loadPinnedPrettier } = pinnedPrettier;
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const proj = path.resolve(here, "..");
@@ -101,7 +106,6 @@ function readDerived(abs) {
   if (derivedText.has(key)) return derivedText.get(key);
   return fs.readFileSync(abs, "utf8");
 }
-const PINNED = "3.9.6";
 const MAX_WINDOW = 350;
 const ENTRY = "play.html";
 
@@ -116,24 +120,15 @@ const linesOf = (text) => text.replace(/\n$/, "").split("\n");
 const lineOf = (text, offset) => text.slice(0, offset).split("\n").length;
 
 // ── pinned prettier (module API, exactly 3.9.6) ─────────────────────────
+// The resolution lives in tools/pinned-prettier.cjs so this mirror has ONE
+// place that knows where its pinned prettier is: the vendored copy in
+// tools/vendor/prettier/ first, a local node_modules second, $PRETTIER_MJS as
+// the override. The sibling-mirror path this tool used to fall back on is
+// gone: that node_modules is gitignored and committed nowhere, so its loss
+// broke the derive with a module-not-found that read like a broken tool.
 async function loadPrettier() {
-  const candidates = [
-    process.env.PRETTIER_MJS,
-    path.join(proj, "node_modules", "prettier", "index.mjs"),
-    "D:/repos/mirrors/metropolygonia/node_modules/prettier/index.mjs",
-  ].filter(Boolean);
-  for (const c of candidates) {
-    if (!fs.existsSync(c)) continue;
-    try {
-      const pkg = JSON.parse(fs.readFileSync(path.join(path.dirname(c), "package.json"), "utf8"));
-      if (pkg.version !== PINNED) continue;
-      const mod = (await import(pathToFileURL(c).href)).default;
-      if (mod.version === PINNED) return { mod, at: c };
-    } catch {
-      /* try next */
-    }
-  }
-  throw new Error(`pinned prettier ${PINNED} not found (set PRETTIER_MJS to its index.mjs)`);
+  const { mod, file, label } = await loadPinnedPrettier(proj);
+  return { mod, at: `${file} (${label})` };
 }
 
 // format to fixed point: prettier must reach a stable output; most inputs are

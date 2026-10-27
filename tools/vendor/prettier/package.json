@@ -1,0 +1,6 @@
+{
+  "name": "prettier",
+  "version": "3.9.6",
+  "license": "MIT",
+  "description": "prettier 3.9.6 (module API) vendored into newrad-city - the pinned renderer of readable/, src/ and split-spec.json. See VENDOR-README.md."
+}
