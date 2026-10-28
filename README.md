@@ -172,6 +172,15 @@ watch on the export side of the layer, and it fires the moment a slice carries
 an export table that names a binding the module does not declare.
 
 
+## Boot test (2026-10-27)
+
+- Entry: `http://127.0.0.1:4886/play` served by `tools/serve.mjs` with the network blocked (`MAP * 127.0.0.1`).
+- Outcome: **blocked** — a blank white page with no text and no canvas: three.js is a CDN dependency, so offline `THREE` is undefined and every module that touches it throws.
+- Evidence: body 0 chars; canvas none; 127 console errors; 1 failed same-origin request, 3 blocked cross-origin; screenshot taken and deleted (blank, so not evidence).
+- Gaps seen: `/favicon.ico` 404 (the existing recorded gap); no other same-origin 404.
+
+The boot confirms the documented "CDN dependencies stay CDN" structure: the immediate first-party load (`/play` 200, `/.netlify/scripts/rum` 200) is complete, and the only blocker is the external three.js script (`cdn.jsdelivr.net`, plus two Google Fonts stylesheets) that the capture deliberately does not backfill. Offline playability is therefore refuted; the with-network-playable claim is untouched.
+
 ## Updating from upstream
 
 ```
