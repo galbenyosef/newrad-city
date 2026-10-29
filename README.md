@@ -44,12 +44,12 @@ Source: https://newrad.city/play
 ## What this is
 
 NEW RAD CITY (newrad.city/play) — capture-class mirror. The origin is a
-Netlify deploy whose `/play` route serves one 22,667,976 B document carrying
+Netlify deploy whose `/play` route serves one 22,667,970 B document carrying
 the whole game: 630 inline `<script>` blocks (22,515,466 B — the project's own
 single-file build, every `src/…` module inlined with its banner), 12 inline
 `<style>` blocks (139,891 B) and a small UI markup shell (divs, SVG, canvas
 elements). Captured whole, byte-exact under `.upstream/manifest.json`:
-**2 files, 22,679,117 bytes** — the entry document (`play.html`) and the
+**2 files, 22,679,111 bytes** — the entry document (`play.html`) and the
 Netlify RUM beacon (`.netlify/scripts/rum`, 11,141 B). The build stamp is
 `window.G_BUILD={"hash": "f1f0628", "time": "2026-10-07 18:36"}`.
 
@@ -181,6 +181,24 @@ an export table that names a binding the module does not declare.
 
 The boot confirms the documented "CDN dependencies stay CDN" structure: the immediate first-party load (`/play` 200, `/.netlify/scripts/rum` 200) is complete, and the only blocker is the external three.js script (`cdn.jsdelivr.net`, plus two Google Fonts stylesheets) that the capture deliberately does not backfill. Offline playability is therefore refuted; the with-network-playable claim is untouched.
 
+## Boot test (2026-10-29 refresh)
+
+- Entry: `http://127.0.0.1:4783/play` served by `tools/serve.mjs`, headless
+  Chrome 156 with every host resolved to loopback
+  (`--host-resolver-rules="MAP * 127.0.0.1"`), session label
+  `boot-newrad-refresh`.
+- Outcome: **blocked**, identical to 2026-10-27 — blank white page: no visible
+  text, no canvas.
+- Evidence (CDP): `THREE: undefined`, `canvas: 0`, body innerText `""`;
+  127 `TypeError` exceptions (`Cannot read properties of undefined (reading
+  'Vector3' / 'Material' / 'Color' / 'noise')`), 3 failed cross-origin
+  requests (`ERR_CONNECTION_REFUSED`: jsdelivr three.js + the two Google Fonts
+  stylesheets).
+- Same-origin: `/play` 200 (22,667,970 B), `/.netlify/scripts/rum` 200
+  (11,141 B) — the capture is complete; `/favicon.ico` 404 (the recorded gap).
+- Screenshot: taken and **not saved** — the frame was uniformly blank white,
+  so it is not evidence. There is no `docs/boot-2026-10-29-refresh.png`.
+
 ## Updating from upstream
 
 ```
@@ -294,6 +312,50 @@ tree (`node tools/capture.mjs`), re-cutting the manifest, and re-deriving
   derivation; a deep identifier rename campaign has not been run. The
   bug-report submit path is a documented backend gap. Rebuild the derived
   layers any time with `node tools/derive.mjs`.
+
+### 2026-10-29 refresh (fleet drift probe: 1 of 2 files changed)
+
+- **Probe** — `node tools/update.mjs` → `DRIFT: 1 changed, 0 live-missing (of 2
+  captured)`: `play.html` only. `.netlify/scripts/rum` (11,141 B) unchanged.
+- **What actually changed (6 bytes)** — the document shrank 22,667,976 →
+  22,667,970 B. The game is untouched: the build stamp is the same
+  `window.G_BUILD={"hash": "f1f0628", "time": "2026-10-07 18:36"}`, all 630
+  inline scripts (22,515,466 B) and 12 inline styles (139,891 B) are identical,
+  and the whole diff is the Netlify **edge-injected** `netlify-rum-container`
+  tag: its `data-netlify-cwv-token` JWT payload changed (`"iss":"netlify"` →
+  `"issuer":"nfserver"`) and the tag/blank-line ordering shifted. That token is
+  a rotating per-response/per-deploy edge value, not project content — hence
+  `update.mjs` (which normalizes nonces/UUIDs/CF tokens but not this JWT)
+  reports it as drift.
+- **Refresh** — old `play.html` copied to `legacy/2026-10-29/play.html`
+  (sha256 `6474efc…a4ef5`) before overwriting; `node tools/capture.mjs` then
+  re-fetched to the closure fixpoint (`round 2: 0 new references`, 5 requests,
+  2 files, 22,679,111 B, 1 recorded 404 `favicon.ico`, 6 external).
+  `.upstream/manifest.json` and `_mirror-report.json` re-cut: `play.html`
+  now 22,667,970 B / sha256 recorded. No file went missing upstream.
+- **Re-derive** (`node tools/derive.mjs`, after the capture) — `readable/` 643
+  twins + `src/` 2,945 slices + `readable/index-inline-map.json` +
+  `split-spec.json` regenerated: `643 readable file(s), 2945 src slices
+  (2945/2945 parse standalone, 2945/2945 round-trip byte-exact), 1669 skipped,
+  12 wholeFile, 631 pretty js parse clean, 0 notRendered, 0 orphan(s) pruned —
+  self-check clean`. Because only the edge tag changed, **every derived file
+  came out byte-identical to the previous derivation** (`git status` showed no
+  change under `readable/`, `src/` or `split-spec.json`), so there was nothing
+  superseded to archive in `legacy/`.
+- **Gates (verbatim)** — `node tools/verify.mjs` → `2 files checked, 0
+  problems`; `node tools/audit.js` → `AUDIT PASS` (4626 sections, 2945/2945
+  round-trips, 643/643 pretties, 631/631 parse, 0 imports); `node
+  tools/check-exports.mjs` → `0 export table(s) checked` / `no public export
+  name lost`; `node tools/check-links.mjs` → `631 scopes … 0 export tables …
+  every export table names a binding the layer declares: YES`; `node
+  tools/capture.mjs --check` → `1 reference group(s), 0 unresolved (0 new vs
+  _mirror-report.json)`, 6 external; `node
+  tools/net-crosscheck.mjs docs/boot-network-2026-10-13.json` → `0 new
+  missing`; `node tools/update.mjs` → `up to date: 2 captured files identical
+  upstream`.
+- **Boot (offline)** — see "Boot test (2026-10-29 refresh)" above: still
+  **blocked**, unchanged conclusion.
+- Prior records above are kept as written for the 2026-10-13 capture.
 
 ## Mirror conventions
 
